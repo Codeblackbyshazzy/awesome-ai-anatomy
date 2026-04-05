@@ -1,6 +1,6 @@
-# DeerFlow 2.0: Bytedance's Open-Source SuperAgent Harness
+# DeerFlow 2.0: How ByteDance's Agent Framework Actually Works
 
-> A Staff Engineer's deep-dive into how ByteDance built a production-grade agent orchestration system that hit #1 on GitHub Trending.
+> I read through the DeerFlow 2.0 source code to understand what's inside a 58K-star agent harness. Here's what I found, what impressed me, and what didn't.
 
 ## At a Glance
 
@@ -12,276 +12,313 @@
 | Framework | LangGraph + FastAPI + Next.js |
 | License | MIT |
 | First commit | May 2025 |
-| v2.0 | Feb 2026 (complete ground-up rewrite) |
+| v2.0 | Feb 2026 (complete ground-up rewrite, shares zero code with v1) |
 
-DeerFlow is not another ChatGPT wrapper. It's a **SuperAgent harness** — an orchestration layer that manages sub-agents, sandboxed execution, persistent memory, and multi-channel messaging. Think of it as the OS that makes a single LLM behave like a team of engineers.
-
----
-
-## Architecture Overview
-
-```
-┌──────────────────────────────────────┐
-│         Nginx (Port 2026)            │
-│         Unified reverse proxy        │
-└───────┬──────────────────┬───────────┘
-        │                  │
-        ▼                  ▼
-┌────────────────────┐  ┌──────────────────────┐
-│  LangGraph Server  │  │   Gateway API (8001)  │
-│   (Port 2024)      │  │   FastAPI REST        │
-│                    │  │                      │
-│  ┌──────────────┐  │  │  Models, MCP, Skills, │
-│  │  Lead Agent  │  │  │  Memory, Uploads,     │
-│  │  ┌────────┐  │  │  │  Artifacts            │
-│  │  │Middlew.│  │  │  └──────────────────────┘
-│  │  │ Chain  │  │  │
-│  │  └────────┘  │  │
-│  │  ┌────────┐  │  │
-│  │  │ Tools  │  │  │
-│  │  └────────┘  │  │
-│  │  ┌────────┐  │  │
-│  │  │SubAgent│  │  │
-│  │  └────────┘  │  │
-│  └──────────────┘  │
-└────────────────────┘
-```
-
-The system splits into two backend services behind Nginx:
-
-1. **LangGraph Server** — runs the actual agent loop. Every user message enters here, passes through the middleware chain, hits the LLM, and tools get called.
-2. **Gateway API** — a FastAPI REST service that handles everything besides inference: model config, MCP server management, skill CRUD, memory endpoints, file uploads, and artifact serving.
-
-This separation is deliberate. The agent loop is stateful and long-running (a single task can run for hours). The Gateway is stateless REST. Deploying them separately means you can scale them independently.
+DeerFlow is an orchestration layer that lets one LLM manage sub-agents, run sandboxed code, and persist memory across conversations. ByteDance calls it a "SuperAgent harness." It hit #1 on GitHub Trending when v2.0 launched.
 
 ---
 
-## The Middleware Chain: DeerFlow's Secret Weapon
+## Architecture
 
-This is the most interesting piece of engineering in the whole codebase.
+The system runs two backend services behind Nginx:
 
-Every message passes through a chain of middlewares before reaching the LLM. Each middleware handles exactly one cross-cutting concern. The ordering is strict and documented in code comments:
+```mermaid
+flowchart LR
+    User([User]) --> Nginx[Nginx :2026]
+    Nginx -->|/api/langgraph/*| LG[LangGraph Server :2024]
+    Nginx -->|/api/*| GW[Gateway API :8001]
+    Nginx -->|static| FE[Next.js Frontend]
+
+    subgraph LG[LangGraph Server]
+        direction TB
+        MSG[Message In] --> MW[Middleware Chain<br/>14+ middlewares]
+        MW --> LLM[LLM Call]
+        LLM --> TD[Tool Dispatch]
+        TD --> SA[SubAgent Pool]
+        TD --> SB[Sandbox]
+        TD --> MCP[MCP Servers]
+        SA --> RES[Response Out]
+        SB --> RES
+        MCP --> RES
+        LLM --> RES
+    end
+
+    subgraph GW[Gateway API]
+        direction TB
+        MOD[Models Config]
+        SKL[Skills CRUD]
+        MEM[Memory Endpoints]
+        UPL[Uploads & Artifacts]
+        MCPC[MCP Config]
+    end
+```
+
+The split is straightforward: LangGraph Server handles the stateful agent loop (can run for hours on a single task). Gateway API is stateless REST for everything else — model config, skill management, memory, file uploads.
+
+I've seen this pattern before in ad-serving systems — separate the hot path from the control plane. It works, though I wonder if LangGraph is the right abstraction here. More on that later.
+
+---
+
+## The Middleware Chain
+
+This is the most interesting engineering decision in the codebase. Every message passes through 14+ middlewares in strict order. Get the order wrong and you get subtle bugs.
+
+```mermaid
+flowchart TD
+    IN([Message In]) --> TD[ThreadDataMiddleware<br/><i>creates per-thread dirs</i>]
+    TD --> UP[UploadsMiddleware<br/><i>injects new files</i>]
+    UP --> SB[SandboxMiddleware<br/><i>acquires sandbox env</i>]
+    SB --> SA[SandboxAuditMiddleware<br/><i>logs file ops</i>]
+    SA --> DT[DanglingToolCallMiddleware<br/><i>patches orphan calls</i>]
+    DT --> LE[LLMErrorHandlingMiddleware<br/><i>retry with backoff</i>]
+    LE --> TE[ToolErrorHandlingMiddleware<br/><i>exceptions → ToolMessages</i>]
+    TE --> SU[SummarizationMiddleware<br/><i>compress when near limit</i>]
+    SU --> TODO[TodoMiddleware<br/><i>task tracking in plan mode</i>]
+    TODO --> TU[TokenUsageMiddleware<br/><i>cost monitoring</i>]
+    TU --> TI[TitleMiddleware<br/><i>auto-title after 1st exchange</i>]
+    TI --> ME[MemoryMiddleware<br/><i>queue for async extraction</i>]
+    ME --> VI[ViewImageMiddleware<br/><i>inject images for vision models</i>]
+    VI --> LD[LoopDetectionMiddleware<br/><i>warn@3, kill@5 repeats</i>]
+    LD --> SL[SubagentLimitMiddleware<br/><i>cap parallel tasks</i>]
+    SL --> CL[ClarificationMiddleware<br/><i>MUST BE LAST</i>]
+    CL --> OUT([To LLM])
+
+    style TD fill:#e1f5fe
+    style SB fill:#e1f5fe
+    style SA fill:#e1f5fe
+    style LE fill:#fff3e0
+    style TE fill:#fff3e0
+    style DT fill:#fff3e0
+    style LD fill:#ffebee
+    style SL fill:#ffebee
+    style CL fill:#ffebee
+
+```
+
+The color coding: 🔵 infrastructure, 🟠 error handling, 🔴 safety.
+
+Three ordering constraints matter:
+
+> ⚠️ **ThreadDataMiddleware must run first** — everything downstream needs a thread_id to function.
+>
+> ⚠️ **SummarizationMiddleware must run before MemoryMiddleware** — otherwise you might summarize away content that memory extraction hasn't processed yet.
+>
+> ⚠️ **ClarificationMiddleware must be last** — if it's not, a downstream middleware might act on something that should've been sent back to the user as a question.
+
+These constraints are documented as code comments next to the `_build_middlewares` function. That's fine for now, but I've worked on systems where the middleware dependency graph got complex enough that we needed a topological sort to wire them up. With 14+ middlewares, they're getting close to that threshold.
+
+One thing I genuinely liked: each middleware handles exactly one concern. `LoopDetectionMiddleware` doesn't also try to do rate limiting. `SandboxMiddleware` doesn't try to also manage thread state. Clean separation. I've seen too many agent codebases where one giant `process_message()` function handles everything.
+
+---
+
+## SubAgent System
+
+The parallel execution design is solid. Two thread pools:
 
 ```python
-# ThreadDataMiddleware must be before SandboxMiddleware
-#   to ensure thread_id is available
-# DanglingToolCallMiddleware patches missing ToolMessages
-#   before model sees the history
-# SummarizationMiddleware should be early to reduce context
-#   before other processing
-# ClarificationMiddleware should be last to intercept
-#   clarification requests after model calls
-```
-
-### The Full Chain (14 middlewares in v2.0):
-
-| # | Middleware | What it does | Why it matters |
-|---|-----------|-------------|----------------|
-| 1 | ThreadDataMiddleware | Creates per-thread isolated directories (workspace, uploads, outputs) | Every conversation gets its own filesystem. No cross-contamination. |
-| 2 | UploadsMiddleware | Injects newly uploaded files into conversation context | PDFs, Excel, PPTs auto-converted to Markdown before the LLM sees them |
-| 3 | SandboxMiddleware | Acquires sandbox environment for code execution | Can be local filesystem or Docker-based isolation |
-| 4 | SandboxAuditMiddleware | Logs sandbox file operations for security auditing | Production safety net — every file read/write gets logged |
-| 5 | DanglingToolCallMiddleware | Patches orphaned tool calls that lack responses | Prevents LLM confusion from interrupted tool executions |
-| 6 | LLMErrorHandlingMiddleware | Catches LLM provider errors, retries with backoff | Your agent doesn't crash because OpenAI returned a 500 |
-| 7 | ToolErrorHandlingMiddleware | Converts tool exceptions into proper ToolMessages | The LLM sees "tool X failed because Y" instead of a raw traceback |
-| 8 | SummarizationMiddleware | Compresses conversation history when approaching token limits | Configurable trigger thresholds, uses a separate cheap model |
-| 9 | TodoMiddleware | Tracks multi-step task progress in plan mode | Real-time task status updates streamed to the UI |
-| 10 | TokenUsageMiddleware | Tracks per-turn and cumulative token usage | Cost monitoring baked into the runtime |
-| 11 | TitleMiddleware | Auto-generates conversation titles after first exchange | UX polish — no "Untitled" threads |
-| 12 | MemoryMiddleware | Queues conversations for async memory extraction | Memory updates are debounced to minimize LLM calls |
-| 13 | ViewImageMiddleware | Injects image data for vision-capable models | Only activates when the model config has `supports_vision: true` |
-| 14 | LoopDetectionMiddleware | Detects and breaks repetitive tool call loops | P0 safety: warn at 3 repeats, force-stop at 5 |
-| 15 | SubagentLimitMiddleware | Truncates excess parallel task calls | Hard cap of N per turn — excess calls silently discarded |
-| 16 | DeferredToolFilterMiddleware | Hides deferred tool schemas from model binding | Dynamic tool loading — not all tools visible at all times |
-| LAST | ClarificationMiddleware | Intercepts clarification requests and interrupts execution | Must be last to catch any tool calls that need user input |
-
-### Why This Matters
-
-Most agent frameworks treat middleware as an afterthought. DeerFlow makes it the primary extension point. Want to add rate limiting? Write a middleware. Want to inject custom context? Middleware. Want to audit every LLM call? Middleware.
-
-The ordering constraints are the real engineering here. Getting them wrong causes subtle bugs:
-- If SummarizationMiddleware runs *after* MemoryMiddleware, you might summarize away information that memory extraction hasn't processed yet
-- If ClarificationMiddleware isn't last, a downstream middleware might act on a message that should have been intercepted for user clarification
-- If ThreadDataMiddleware doesn't run first, nothing else has a thread_id to work with
-
----
-
-## SubAgent System: Parallel Task Execution
-
-DeerFlow's subagent system is essentially a work-stealing thread pool for AI tasks.
-
-```python
-# Two thread pools: schedulers and executors
 _scheduler_pool = ThreadPoolExecutor(max_workers=3, thread_name_prefix="subagent-scheduler-")
 _execution_pool = ThreadPoolExecutor(max_workers=3, thread_name_prefix="subagent-exec-")
 ```
 
-**How it works:**
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant LA as Lead Agent
+    participant SP as Scheduler Pool
+    participant EP as Executor Pool
 
-1. The lead agent calls `task(description="...", prompt="...", subagent_type="general-purpose")`
-2. The executor spins up a new agent in a background thread
-3. The subagent gets its own sandbox, tools, and context — but shares the parent's thread data
-4. Max 3 concurrent subagents per turn, 15-minute timeout
-5. Results stream back via SSE events
+    U->>LA: "Compare AWS, Azure, GCP, Alibaba, Oracle"
+    LA->>LA: Decompose: 5 sub-tasks, limit is 3/turn
 
-**The Hard Concurrency Limit**
+    par Batch 1 (3 concurrent)
+        LA->>SP: task("AWS analysis")
+        LA->>SP: task("Azure analysis")
+        LA->>SP: task("GCP analysis")
+        SP->>EP: Execute SubAgent 1
+        SP->>EP: Execute SubAgent 2
+        SP->>EP: Execute SubAgent 3
+    end
 
-This is enforced at two levels:
-- **SubagentLimitMiddleware** silently truncates excess `task()` calls in the model's response
-- **The system prompt** explicitly instructs the model to count sub-tasks and batch them: "I have 6 sub-tasks, limit is 3, I'll launch 3 now and 3 next turn"
+    EP-->>LA: Results (batch 1)
 
-The prompt engineering here is remarkably detailed — over 200 lines dedicated to teaching the model how to decompose, batch, and synthesize parallel work. This is not "just call task()" — it's a full orchestration protocol.
+    par Batch 2 (2 remaining)
+        LA->>SP: task("Alibaba analysis")
+        LA->>SP: task("Oracle analysis")
+        SP->>EP: Execute SubAgent 4
+        SP->>EP: Execute SubAgent 5
+    end
+
+    EP-->>LA: Results (batch 2)
+    LA->>U: Synthesized comparison
+
+    Note over SP,EP: 15-min timeout per subagent<br/>Max 3 concurrent
+```
+
+The batching is enforced at two levels: `SubagentLimitMiddleware` silently truncates excess `task()` calls, and the system prompt has 200+ lines teaching the model to count sub-tasks and plan batches.
+
+That prompt section is... a lot. It's the kind of thing you write when you've been burned by the model launching 8 parallel tasks and crashing. I get it. But 200 lines of "HOW TO DO PARALLELISM" in a system prompt feels like fighting the model instead of constraining it architecturally. A hard cap in the runtime (which they have) plus a 20-line prompt guide would probably be enough.
+
+**The real limitation:** subagent depth is exactly 1. Subagents can't spawn their own subagents. For 90% of tasks this is fine, but it means DeerFlow can't do deep recursive decomposition — the kind of thing you need for, say, analyzing a multi-module codebase where each module has sub-components that need their own analysis. That's a real ceiling, not just a nice-to-have.
 
 ---
 
-## Memory System: LLM-Powered Persistent Context
+## Memory System
 
-DeerFlow's memory is more structured than most implementations I've seen.
-
-### Memory Schema
+The memory schema is actually well-designed:
 
 ```json
 {
   "version": "1.0",
-  "lastUpdated": "2026-04-05T12:00:00Z",
   "user": {
     "workContext": {"summary": "...", "updatedAt": "..."},
     "personalContext": {"summary": "...", "updatedAt": "..."},
     "topOfMind": {"summary": "...", "updatedAt": "..."}
   },
   "history": {
-    "recentMonths": {"summary": "...", "updatedAt": "..."},
-    "earlierContext": {"summary": "...", "updatedAt": "..."},
-    "longTermBackground": {"summary": "...", "updatedAt": "..."}
+    "recentMonths": {"summary": "..."},
+    "earlierContext": {"summary": "..."},
+    "longTermBackground": {"summary": "..."}
   },
   "facts": [
-    {"id": "...", "content": "...", "category": "...", "confidence": 0.9, "createdAt": "..."}
+    {"id": "...", "content": "...", "category": "...", "confidence": 0.9}
   ]
 }
 ```
 
-Key design decisions:
-
-1. **Structured memory over flat text** — separate slots for work context, personal context, top-of-mind, and historical context at three time horizons
-2. **Confidence-scored facts** — each fact has a 0-1 confidence score. Low-confidence facts can be pruned or verified.
-3. **Debounced updates** — memory extraction doesn't happen after every message. It batches conversation chunks and processes them asynchronously.
-4. **File-based storage with mtime caching** — simple JSON files, but with modification-time based cache invalidation to avoid unnecessary reads.
-
-### Memory vs. OpenClaw vs. Claude Code
+Compared to OpenClaw's flat `MEMORY.md` or Claude Code's `CLAUDE.md` rules file, this has real structure: three time horizons for history, separate work/personal context, and confidence-scored facts.
 
 | Feature | DeerFlow | OpenClaw | Claude Code |
 |---------|----------|----------|-------------|
 | Storage | JSON files | MEMORY.md (markdown) | CLAUDE.md |
-| Structure | Hierarchical (user/history/facts) | Flat markdown with sections | Flat rules |
+| Structure | Hierarchical (user/history/facts) | Flat markdown | Flat rules |
 | Updates | LLM-extracted, debounced, async | Manual + agent-written | Manual only |
-| Confidence | Per-fact confidence scores | No | No |
+| Confidence | Per-fact 0-1 scores | No | No |
 | Multi-agent | Per-agent isolated memory | Per-workspace | Per-project |
 
----
+```mermaid
+flowchart LR
+    CONV([Conversation]) --> MM[MemoryMiddleware<br/><i>debounce & queue</i>]
+    MM --> LLM[LLM Extraction<br/><i>cheap model</i>]
+    LLM --> CAT{Categorize}
+    CAT --> |work| WC[workContext]
+    CAT --> |personal| PC[personalContext]
+    CAT --> |top-of-mind| TOM[topOfMind]
+    CAT --> |fact| F[facts[] + confidence]
+    CAT --> |history| H[history.recentMonths]
 
-## Loop Detection: A P0 Safety Feature
+    JSON[(memory.json)] --> SYS[System Prompt Injection]
+    WC --> JSON
+    PC --> JSON
+    TOM --> JSON
+    F --> JSON
+    H --> JSON
 
-This is the kind of thing that separates production systems from demos.
-
-```python
-_DEFAULT_WARN_THRESHOLD = 3  # inject warning after 3 identical calls
-_DEFAULT_HARD_LIMIT = 5      # force-stop after 5 identical calls
-_DEFAULT_WINDOW_SIZE = 20    # track last N tool calls
+    style MM fill:#e1f5fe
+    style LLM fill:#fff3e0
 ```
 
-The algorithm:
-1. After each model response, hash all tool calls (name + args, order-independent)
-2. Track hashes in a sliding window per thread (LRU-evicted at 100 threads)
-3. At 3 identical calls: inject a system message "you are repeating yourself — wrap up"
-4. At 5 identical calls: strip all tool_calls from the response, forcing a text answer
-
-The hash function normalizes tool call order so `[search("A"), read("B")]` and `[read("B"), search("A")]` produce the same hash. This prevents the model from "evading" detection by reordering its calls.
+The debounced update design is smart — you don't want an LLM call after every single message. But the underlying storage is a single JSON file with `mtime`-based cache invalidation. I didn't see any file locking in the storage layer. If two concurrent threads try to update memory at the same time, I'd bet real money you get a corrupted JSON file. For single-user local deployment this is fine. Multi-tenant? You'd need to rip out the storage layer entirely.
 
 ---
 
-## Sandbox System: Virtual Path Translation
+## Loop Detection
 
-DeerFlow's sandbox isolates each thread's file operations through virtual path translation:
+This is one of those features that sounds boring until your agent burns $200 in API calls because it's stuck calling the same tool in a loop. I've been there.
+
+```mermaid
+stateDiagram-v2
+    [*] --> Normal
+    Normal --> Normal : unique tool hash
+    Normal --> Warning : same hash ×3
+    Warning --> Normal : different hash
+    Warning --> HardStop : same hash ×5
+    HardStop --> [*] : thread ends
+
+    note right of Warning
+        Injects "you are repeating yourself"
+        system message (once per hash)
+    end note
+    note right of HardStop
+        Strips ALL tool_calls
+        Forces text-only response
+    end note
+    note left of Normal
+        Window: last 20 calls
+        LRU: 100 threads max
+    end note
+```
+
+The hash is order-independent — `[search("A"), read("B")]` and `[read("B"), search("A")]` produce the same hash. Nice touch. Prevents the model from "evading" detection by shuffling call order.
+
+---
+
+## Sandbox: Virtual Paths
+
+Every thread gets an isolated filesystem through virtual path translation:
 
 ```
-Virtual Path                    →  Physical Path
-/mnt/user-data/workspace/       →  ~/.deerflow/threads/{thread_id}/workspace/
-/mnt/user-data/uploads/         →  ~/.deerflow/threads/{thread_id}/uploads/
-/mnt/user-data/outputs/         →  ~/.deerflow/threads/{thread_id}/outputs/
-/mnt/skills/                    →  deer-flow/skills/
+/mnt/user-data/workspace/  →  ~/.deerflow/threads/{thread_id}/workspace/
+/mnt/user-data/uploads/    →  ~/.deerflow/threads/{thread_id}/uploads/
+/mnt/user-data/outputs/    →  ~/.deerflow/threads/{thread_id}/outputs/
+/mnt/skills/               →  deer-flow/skills/
 ```
 
-Two providers:
-- **LocalSandboxProvider** — filesystem isolation only (bash disabled by default for safety)
-- **AioSandboxProvider** — full Docker container isolation with bash access
+Two providers: `LocalSandboxProvider` (filesystem isolation, bash disabled for safety) and `AioSandboxProvider` (full Docker container, bash enabled).
 
-The `str_replace` tool has a clever per-path mutex:
-
-> "File-write safety: str_replace serializes read-modify-write per (sandbox.id, path) so isolated sandboxes keep concurrency even when virtual paths match"
-
-This prevents race conditions when multiple subagents try to edit the same file simultaneously.
+The `str_replace` tool uses a per-path mutex lock, so concurrent subagents editing different files don't block each other, but two subagents editing the same file are serialized. Standard stuff from distributed systems — but good to see it here. Most agent frameworks don't think about concurrent file access at all.
 
 ---
 
-## IM Bridge: Native Chat Platform Integration
+## Clarification: CLARIFY → PLAN → ACT
 
-DeerFlow natively supports Feishu, Slack, and Telegram as first-class messaging channels.
+The `ClarificationMiddleware` is a proper execution interrupt, not just a prompt hint. When the agent calls `ask_clarification()`, execution halts entirely — no downstream tools run. The question goes to the user. When they respond, execution resumes.
 
-The Feishu integration is the most sophisticated — it streams responses via `runs.stream()` and updates a single in-thread card in place (patching the same `message_id` until the run finishes). Slack and Telegram still use the simpler `runs.wait()` response path.
+This must be the LAST middleware in the chain. If it were earlier, something downstream might act on a message that should've been kicked back to the user.
 
-This makes DeerFlow usable as a "deploy once, message anywhere" system — same agent, same memory, accessible from your team's existing chat tools.
-
----
-
-## Clarification System: Ask Before Acting
-
-The clarification system is a full interruption mechanism, not just a prompt hint.
-
-The ClarificationMiddleware sits at the end of the chain (this is critical). When the agent calls `ask_clarification()`:
-1. The middleware intercepts the tool call
-2. Execution halts — no further tools run
-3. The question is surfaced to the user
-4. On user response, execution resumes from where it paused
-
-The system prompt dedicates ~150 lines to teaching the model **when** to ask for clarification:
-- Missing information ("create a web scraper" without specifying the target)
-- Ambiguous requests (multiple valid interpretations)
-- Destructive operations (delete, overwrite)
-
-The workflow priority is explicitly stated: **CLARIFY → PLAN → ACT**. Never start working and clarify mid-execution.
+The system prompt dedicates ~150 lines to teaching the model when to ask vs. when to just proceed. Honestly, this feels over-specified. In my experience, a simpler "when in doubt, ask" heuristic plus a few examples works just as well and doesn't burn 150 lines of prompt budget.
 
 ---
 
-## What DeerFlow Gets Right
+## IM Bridge
 
-1. **Middleware-first architecture** — makes the system extensible without touching core agent logic
-2. **Loop detection as P0** — production agents will loop. Detecting and breaking loops prevents cost blowup and poor UX.
-3. **Structured memory with confidence** — most agent memory is "append text to a file." DeerFlow's hierarchical schema with confidence scores is meaningfully better.
-4. **Subagent batching protocol** — the 200+ line system prompt section teaching the model to batch parallel work is serious prompt engineering
-5. **Virtual path isolation** — clean abstraction over local vs. Docker sandboxes
+Native Feishu, Slack, and Telegram support. The Feishu integration is the most polished — it streams responses and updates a single in-thread card in place (patching the same `message_id`). Slack and Telegram still use the simpler `runs.wait()` response path.
 
-## What Could Be Better
-
-1. **No cost budgets** — token tracking exists but there's no per-thread or per-user spending limit
-2. **Memory is single-file JSON** — works for personal use, won't scale to multi-tenant deployments
-3. **No built-in eval framework** — no way to benchmark agent performance on repeatable tasks
-4. **Subagent depth is 1** — subagents can't spawn their own subagents. For deeply recursive tasks, you're limited to a flat decomposition.
-5. **Security model is advisory** — the security notice says "improper deployment may introduce security risks" but there's no mandatory auth or sandboxing
+Not surprising that Feishu is the best-supported channel, given that DeerFlow comes from ByteDance. But the multi-channel abstraction is clean enough that adding Discord or Teams would be straightforward.
 
 ---
 
-## Key Takeaways for Agent Builders
+## What They Got Right
 
-1. **Invest in middleware.** If you're building an agent system, a middleware chain is the highest-leverage architectural decision you'll make. Every cross-cutting concern becomes a composable, testable unit.
+1. **Middleware-first architecture.** Clean separation of concerns. Each piece is testable in isolation. Want to add security auditing? Write a middleware, slot it in.
 
-2. **Loop detection is not optional.** Every production agent will eventually get stuck. Build the circuit breaker before it costs you $500 in API calls.
+2. **Loop detection as a safety feature, not an afterthought.** The warn-at-3, kill-at-5, order-independent hashing is well thought out. This is the kind of thing that saves you from a $500 API bill at 3am.
 
-3. **Memory needs structure.** "Append everything to a text file" works for prototypes. For anything real, you need categories, confidence scores, and retention policies.
-
-4. **Teach the model to orchestrate.** DeerFlow's subagent prompt is 200+ lines of very specific instructions. Parallel task decomposition doesn't emerge from "be helpful" — it requires explicit protocol design.
-
-5. **Separate your control plane from your data plane.** LangGraph Server (stateful, long-running) vs. Gateway API (stateless REST) is a textbook microservice split that makes scaling tractable.
+3. **Structured memory with confidence scores.** Most agent memory is "append everything to a text file." DeerFlow actually thinks about what to remember and how confident it should be about each fact.
 
 ---
 
-*This teardown is part of [awesome-ai-anatomy](https://github.com/NeuZhou/awesome-ai-anatomy) — a series of Staff Engineer-level deep dives into how production AI systems are actually built.*
+## What I'd Push Back On
+
+1. **LangGraph as the foundation.** I didn't see any discussion of why LangGraph was chosen over, say, a simple state machine or an event-driven architecture. LangGraph adds a layer of abstraction that makes debugging harder — when something goes wrong inside the agent loop, you're debugging through LangGraph's internals, not your own code. For a system this complex, I'd want more control, not less.
+
+2. **No cost budgets anywhere.** Token tracking exists (TokenUsageMiddleware) but there's no per-thread or per-user spending limit. In a system that can spawn 3 subagents and run for hours, this is a real gap. The first time someone deploys this internally and an agent spins up a $300 research session, someone's getting an uncomfortable Slack DM.
+
+3. **Single-file JSON memory with no locking.** Works for personal use. For anything multi-tenant or even multi-thread, this is a corruption bug waiting to happen. The `mtime`-based cache invalidation is clever but won't save you from two concurrent writes.
+
+4. **The security model is basically "good luck."** The security notice says "improper deployment may introduce security risks." There's no auth, no RBAC, no rate limiting at the API level. Deploy this on a public IP and anyone can execute arbitrary code in your sandbox. For an internal ByteDance tool this is probably fine — it sits behind their corporate network. For open-source users spinning this up on a VPS? It's a footgun.
+
+5. **200+ lines of prompt engineering for subagent orchestration.** This suggests the model doesn't naturally handle parallelism well, so they've compensated with an enormous prompt. I'd rather see tighter architectural constraints (e.g., the runtime figures out batching) and a shorter prompt. Fighting the model with prompt length is a losing battle long-term.
+
+---
+
+## Lessons Worth Stealing
+
+**If you're building an agent system, invest in a middleware chain.** It's the highest-leverage architectural decision you'll make. Every cross-cutting concern — logging, error handling, cost tracking, safety — becomes a composable, testable, removable unit. DeerFlow has 14+ of them and the codebase is remarkably clean because of it.
+
+**Build loop detection before you need it.** Not after your agent burns through your API budget at 2am on a Saturday. DeerFlow's approach (hash tool calls, sliding window, escalating intervention) is simple enough to implement in an afternoon and will save you real money.
+
+**Memory needs more than a text file.** If your agent is going to remember things across sessions, think about structure upfront. What categories of information matter? How confident is the agent in each fact? When should facts expire? DeerFlow's schema isn't perfect, but it's a meaningful step above "append to MEMORY.md."
+
+---
+
+*Part of [awesome-ai-anatomy](https://github.com/NeuZhou/awesome-ai-anatomy) — source-level teardowns of how production AI systems actually work.*
