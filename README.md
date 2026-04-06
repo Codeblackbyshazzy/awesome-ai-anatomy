@@ -1,7 +1,7 @@
 <p align="center">
   <img src="https://img.shields.io/github/stars/NeuZhou/awesome-ai-anatomy?style=social" alt="Stars">
   <img src="https://img.shields.io/github/forks/NeuZhou/awesome-ai-anatomy?style=social" alt="Forks">
-  <img src="https://img.shields.io/badge/teardowns-2-blue" alt="Teardowns">
+  <img src="https://img.shields.io/badge/teardowns-10-blue" alt="Teardowns">
   <img src="https://img.shields.io/badge/updated-daily-brightgreen" alt="Updated Daily">
   <img src="https://img.shields.io/badge/license-MIT-orange" alt="License">
 </p>
@@ -19,7 +19,7 @@ Most "awesome" lists link to repos. We **dissect** them — architecture diagram
 ## 📋 Table of Contents
 
 - [Project Index](#-project-index)
-- [Latest: Claude Code](#-latest-claude-code--510k-lines-dissected)
+- [横向对比 / Cross-Project Comparison](#-横向对比--cross-project-comparison)
 - [What Makes This Different](#-what-makes-this-different)
 - [Each Teardown Includes](#-each-teardown-includes)
 - [Video Series](#-video-series)
@@ -30,89 +30,36 @@ Most "awesome" lists link to repos. We **dissect** them — architecture diagram
 
 ## 📊 Project Index
 
-| # | Project | Lines | Key Findings | Status |
-|---|---------|-------|-------------|--------|
-| 001 | [**Claude Code**](claude-code/) | 510K TS | 4-layer context management, streaming tool execution, hidden pet system (18 species!), 1729-line God Object | ✅ Published |
-| 002 | [**Guardrails AI**](guardrails-ai/) | 18K Python | npm-for-validators Hub model, RAIL XML dead weight, 1076-line Guard God Object, reask loop, ClawGuard comparison | ✅ Published |
-| 003 | **DeerFlow** (ByteDance) | TBD | Coming soon | 🔜 Next |
-| 004 | **Cursor** | TBD | — | 📋 Planned |
-| 005 | **Dify** | TBD | — | 📋 Planned |
-| 006 | **AutoGPT** | TBD | — | 📋 Planned |
+| # | Project | Stars | Language | Lines | Key Findings | Status |
+|---|---------|-------|----------|-------|-------------|--------|
+| 001 | [**Dify**](dify/) | 136K ⭐ | Python + TS | 1.24M | Visual workflow builder, `graphon` graph engine extraction, 7+ Docker containers, 30+ vector DB support | ✅ Published |
+| 002 | [**DeerFlow**](deer-flow/) | 58K ⭐ | Python + TS | — | 14-layer middleware chain, hash-based loop detection (warn@3, kill@5), no auth/RBAC | ✅ Published |
+| 003 | [**MiroFish**](mirofish/) | 50K ⭐ | Python + Vue | 39K | LLM-driven social simulation disguised as "collective intelligence," OASIS engine wrapper, ReACT forced-tool-use | ✅ Published |
+| 004 | [**Goose**](goose/) | 37K ⭐ | Rust + TS | 198K | MCP-first extension bus, 5-inspector tool inspection pipeline, 30+ LLM providers | ✅ Published |
+| 005 | [**Pi Mono**](pi-mono/) | 32K ⭐ | TypeScript | 147K | Game-engine architecture, stealth mode (impersonates Claude Code), clean 7-package monorepo | ✅ Published |
+| 006 | [**Lightpanda**](lightpanda-browser/) | 27K ⭐ | Zig + Rust | 91K | From-scratch headless browser for AI agents, 9x faster than Chrome, Zig comptime V8 bindings | ✅ Published |
+| 007 | [**Hermes Agent**](hermes-agent/) | 26K ⭐ | Python | 260K | OpenClaw's Python twin, self-improving skill system, FTS5 session search, frozen memory snapshots | ✅ Published |
+| 008 | [**oh-my-claudecode**](oh-my-claudecode/) | 24K ⭐ | TypeScript | 194K | 19-agent team orchestration via file-based IPC, model tier routing (Haiku→Opus), Claude Code plugin | ✅ Published |
+| 009 | [**Guardrails AI**](guardrails-ai/) | 6.6K ⭐ | Python | 18K | npm-for-validators Hub model, reask loop for LLM self-correction, 1076-line Guard God Object | ✅ Published |
+| 010 | [**Claude Code**](claude-code/) | N/A (proprietary) | TypeScript | 510K | 4-layer context management, streaming tool execution, hidden pet system (18 species!), 1729-line God Object | ✅ Published |
+
+> Projects sorted by GitHub stars (descending). Claude Code is proprietary (leaked via source map) so stars are N/A.
 
 ---
 
-## 🔥 Latest: Claude Code — 510K Lines Dissected
+## 🆚 横向对比 / Cross-Project Comparison
 
-Anthropic's AI coding agent, leaked via npm source maps on 2026/03/31. 510,000 lines of TypeScript. Here's what we found.
+We maintain a detailed **[COMPARISON.md](COMPARISON.md)** with side-by-side analysis across all 10 projects:
 
-### Architecture at a Glance
+- Quick Reference (creator, stars, language, type, license)
+- Architecture patterns (agent loop, extensibility, deployment)
+- Multi-agent & orchestration approaches
+- Memory & persistence strategies
+- Safety & security postures
+- Design patterns and anti-patterns found
+- "If I Were Building an Agent Today" synthesis
 
-```
-┌──────────────────────────────────────────────────────────┐
-│                    CLI Entry (Bun)                        │
-│  Cold start 4-5x faster than Node · but ecosystem risk   │
-├──────────────────────────────────────────────────────────┤
-│              React + Ink Terminal UI                      │
-│  Not for beauty — for state management complexity        │
-├──────────────────────────────────────────────────────────┤
-│           while(true) Agent Loop                         │
-│  Simple but created a 1729-line God Object (query.ts)    │
-├──────────────────┬───────────────────────────────────────┤
-│   40 Tool Plugins │    4-Layer Context Management        │
-│   BashTool        │    L1: System prompt (always)        │
-│   FileRead/Write  │    L2: Conversation (importance-     │
-│   WebFetch        │        weighted, not sliding window) │
-│   LSP Integration │    L3: Tool results (summarized)     │
-│   SubAgent spawn  │    L4: Compressed (irreversible!)    │
-├──────────────────┴───────────────────────────────────────┤
-│              3-Layer Memory Architecture                 │
-│  MEMORY.md (pointer index, always in context)            │
-│  Topic Files (loaded on demand)                          │
-│  Raw Transcripts (grep only, never fully loaded)         │
-├──────────────────────────────────────────────────────────┤
-│          Streaming Parallel Execution                    │
-│  RWLock model · subtle race conditions with file changes │
-├──────────────────────────────────────────────────────────┤
-│            Hidden Systems (Easter Eggs)                  │
-│  BUDDY: Tamagotchi pet (18 species, 5 rarities, 1%      │
-│         shiny chance, Mulberry32 PRNG)                   │
-│  KAIROS: Unreleased autonomous background agent          │
-│  Anti-Distillation: Fake tool injection to poison        │
-│         competitor training data                         │
-└──────────────────────────────────────────────────────────┘
-```
-
-### 🏗️ Key Design Decisions (Why, Not Just What)
-
-| Decision | Why They Chose It | The Trade-off |
-|----------|-------------------|---------------|
-| **Bun over Node** | Cold start 4-5x faster for CLI tool | Ecosystem risk — known bug #28001 caused the source map leak |
-| **React+Ink for terminal** | State management complexity, not UI beauty | Heavy dependency for a CLI tool |
-| **`while(true)` over state machine** | Simplicity | Created a 1729-line God Object in `query.ts` |
-| **Importance-weighted context** | Better than sliding window (keeps relevant, drops noise) | Introduces non-determinism — same conversation can produce different context |
-| **Flat worker model (no nesting)** | Avoids complexity explosion | Artificial ceiling for recursive task decomposition |
-| **40 hardcoded tools** | Works now, each tool is simple | Won't scale past ~100 tools — needs tool families/factories |
-
-### ⚠️ Problems We Found
-
-1. **`query.ts` God Object** — 1,729 lines, growing. Merge conflicts guaranteed at scale.
-2. **Irreversible context compression** — Once compressed, the model literally doesn't know what it forgot. Unauditable.
-3. **Dual feature flag systems** — Increases cognitive load for contributors.
-4. **No worker nesting** — Can't do recursive task decomposition (e.g., "refactor module A" → spawn sub-tasks per file).
-5. **Anti-Distillation raises ethical questions** — Injecting fake tool definitions to poison competitor training data.
-
-### 🆚 How It Compares
-
-| Aspect | Claude Code | Cursor | LangChain |
-|--------|------------|--------|-----------|
-| **Paradigm** | Terminal agent (bet on agent future) | IDE augmentation (meet users where they are) | Framework (build your own) |
-| **Context** | Importance-weighted 4-layer | Sliding window + RAG | User-managed |
-| **Tools** | 40 hardcoded, intentionally non-general | IDE-integrated | Generic tool interface |
-| **Memory** | 3-layer (MEMORY.md → Topics → Transcripts) | Per-project context | User-implemented |
-
-### 📖 Full Analysis
-
-➡️ **[Read the complete teardown →](claude-code/README.md)**
+➡️ **[Read the full comparison →](COMPARISON.md)**
 
 ---
 
@@ -167,8 +114,6 @@ Found an error? Have a better analysis? PRs welcome!
 ## 📌 Stay Updated
 
 This repo is updated daily. **Star ⭐ and Watch 👁️ to follow along.**
-
-**Next up: ByteDance DeerFlow** — How China's hottest AI company builds their multi-agent research framework.
 
 ---
 
