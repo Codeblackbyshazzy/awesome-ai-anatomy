@@ -79,7 +79,7 @@ I've seen this pattern before in ad-serving systems — separate the hot path fr
 This is the most interesting engineering decision in the codebase. Every message passes through 14+ middlewares in strict order. Get the order wrong and you get subtle bugs.
 
 ```mermaid
-flowchart TD
+flowchart LR
     IN(["Message In"]) --> TD["ThreadDataMiddleware\ncreates per-thread dirs"]
     TD --> UP["UploadsMiddleware\ninjects new files"]
     UP --> SB["SandboxMiddleware\nacquires sandbox env"]

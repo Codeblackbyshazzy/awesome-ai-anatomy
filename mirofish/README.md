@@ -22,7 +22,7 @@ What MiroFish does, in plain terms: you feed it a document (news article, policy
 ## Architecture
 
 ```mermaid
-flowchart TB
+flowchart LR
     subgraph Frontend["Frontend (Vue.js + Vite)"]
         Step1[Step1: Graph Building]
         Step2[Step2: Environment Config]

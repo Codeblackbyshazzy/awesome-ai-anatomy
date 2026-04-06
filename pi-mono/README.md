@@ -22,7 +22,7 @@ Pi is a monorepo of seven npm packages that together form a full stack for build
 ## Architecture
 
 ```mermaid
-graph TB
+graph LR
     subgraph "pi-mono Monorepo"
         AI["@mariozechner/pi-ai\nUnified LLM API\n37K lines"]
         AGENT["@mariozechner/pi-agent-core\nAgent Loop and State\n3K lines"]

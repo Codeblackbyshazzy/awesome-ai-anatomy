@@ -25,7 +25,7 @@ The weird part: it also spawns Codex and Gemini CLI workers alongside Claude. So
 ## Architecture
 
 ```mermaid
-flowchart TB
+flowchart LR
     subgraph CC["Claude Code (Host)"]
         OMC["OMC Plugin Layer"]
         OMC --> SKILL["Skill System\n(auto-inject)"]

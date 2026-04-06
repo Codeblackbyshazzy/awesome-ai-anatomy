@@ -23,7 +23,7 @@ If you've used OpenClaw, Hermes Agent will feel familiar. Very familiar. Same SO
 ## Architecture
 
 ```mermaid
-flowchart TB
+flowchart LR
     subgraph Entry["Entry Points"]
         CLI["hermes CLI (TUI)"]
         GW["Gateway\n(Telegram/Discord/Slack/\nWhatsApp/Signal)"]
@@ -232,7 +232,7 @@ The no-memory-writes constraint is worth calling out. In DeerFlow, subagents sha
 I spent a while on the `ContextCompressor` because I've burned money on context overflow before. This module does it right — five-step algorithm:
 
 ```mermaid
-flowchart TD
+flowchart LR
     MSG["Message History\n(approaching limit)"] --> S1["Step 1: Prune Tool Results\n(cheap, no LLM)"]
     S1 --> S2["Step 2: Protect Head\n(system prompt + 1st exchange)"]
     S2 --> S3["Step 3: Protect Tail\n(last ~20K tokens verbatim)"]

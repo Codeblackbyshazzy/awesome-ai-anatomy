@@ -22,7 +22,7 @@ Dify is a platform for building AI applications through a visual drag-and-drop i
 ## Architecture
 
 ```mermaid
-flowchart TB
+flowchart LR
     User([User / Browser]) --> Nginx[Nginx Reverse Proxy :80]
     Nginx -->|/api/*| API["API Server\n(Flask + Gunicorn :5001)"]
     Nginx -->|static| Web["Next.js Frontend\n(:3000)"]
@@ -217,7 +217,7 @@ The iteration node is interesting: it doesn't just loop — it builds a child `G
 Dify's RAG implementation is the most comprehensive I've seen in an open-source project. The pipeline covers the full lifecycle from document ingestion to retrieval.
 
 ```mermaid
-flowchart TB
+flowchart LR
     subgraph Ingest["Document Ingestion"]
         Upload["Upload Document\n(PDF/Word/Excel/\nCSV/HTML/Markdown/TXT)"] --> Extract["Extractor\n(pdf_extractor.py\nword_extractor.py\n...)"]
         Extract --> Split["Text Splitter\n(fixed_text, by separator)"]

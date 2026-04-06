@@ -22,7 +22,7 @@ Guardrails AI wraps LLM API calls and validates the output against a schema you 
 ## Architecture
 
 ```mermaid
-flowchart TB
+flowchart LR
     subgraph UserCode["Your Application"]
         UC["guard = Guard()\nguard.use(MyValidator)\nguard(llm_api, messages=...)"]
     end

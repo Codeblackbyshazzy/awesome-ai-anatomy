@@ -51,7 +51,7 @@
 ## Architecture Overview
 
 ```mermaid
-graph TB
+graph LR
     subgraph Entry["🚀 CLI Entry"]
         CLI["claude CLI\n(Bun runtime)"] -->|"lazy import()"| App["Main App\n(React/Ink TUI)"]
     end
@@ -281,7 +281,7 @@ This team uses research methodology in production engineering. They can quantify
 ## Multi-Agent Coordination
 
 ```mermaid
-graph TD
+graph LR
     Main["Main Agent\nTools: TeamCreate, SendMessage, StopWorker"]
     Main -->|spawns| W1["Worker 1"]
     Main -->|spawns| W2["Worker 2"]

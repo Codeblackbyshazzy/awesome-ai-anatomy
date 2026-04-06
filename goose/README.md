@@ -22,7 +22,7 @@ Goose is an on-machine AI agent that runs shell commands, edits files, manages e
 ## Architecture
 
 ```mermaid
-graph TB
+graph LR
     subgraph Entry["Entry Points"]
         CLI["goose CLI\n(goose-cli crate)"]
         Desktop["Desktop App\n(Electron + React)"]

@@ -24,7 +24,7 @@ The pitch: 9x faster than Chrome, 16x less memory, instant startup. The reality:
 ## Architecture
 
 ```mermaid
-graph TB
+graph LR
     subgraph Entry["Binary Entry Points"]
         Main["main.zig"] --> |"serve"| Server["Server.zig\n(CDP WebSocket)"]
         Main --> |"fetch"| Fetch["fetch mode\n(single URL dump)"]
