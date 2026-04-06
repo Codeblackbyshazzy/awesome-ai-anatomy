@@ -52,6 +52,20 @@ flowchart TB
     end
 
     API --> Core
+
+    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
+    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
+    classDef accent fill:#059669,stroke:#047857,color:#fff
+    classDef warn fill:#d97706,stroke:#b45309,color:#fff
+    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
+
+    class User primary
+    class API secondary
+    class WF secondary
+    class RAG accent
+    class PluginDaemon accent
+    class Sandbox warn
+    class SSRF warn
 ```
 
 The first thing that hits you is the service count. Dify's `docker-compose.yaml` is 1,600 lines. The core deployment is 7 containers: API server, Celery worker, Celery beat, Next.js frontend, Redis, PostgreSQL, and Nginx. Then you add a code sandbox (Go-based, isolated execution environment), a plugin daemon (separate process for running third-party plugins), and an SSRF proxy (Squid, to prevent server-side request forgery from user-submitted HTTP nodes). On top of that, you pick a vector database — and the list of supported options is staggering: Weaviate, Qdrant, pgvector, Milvus, Chroma, Elasticsearch, OpenSearch, OceanBase, TiDB, Oracle, and about 15 more.
@@ -161,6 +175,19 @@ flowchart LR
 
         GE -->|events| SSE["SSE Stream\nto client"]
     end
+
+    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
+    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
+    classDef accent fill:#059669,stroke:#047857,color:#fff
+    classDef warn fill:#d97706,stroke:#b45309,color:#fff
+    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
+
+    class Canvas primary
+    class GE secondary
+    class NF secondary
+    class LLM accent
+    class AGENT accent
+    class HI warn
 ```
 
 The supported node types tell you a lot about what Dify considers a "workflow":
@@ -220,6 +247,20 @@ flowchart TB
         PostProc -->|metadata filter| MetaFilter["LLM-based Metadata\nFiltering (optional)"]
         MetaFilter --> Results["Ranked Documents"]
     end
+
+    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
+    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
+    classDef accent fill:#059669,stroke:#047857,color:#fff
+    classDef warn fill:#d97706,stroke:#b45309,color:#fff
+    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
+
+    class Upload primary
+    class Query primary
+    class Embed secondary
+    class Store secondary
+    class PostProc accent
+    class MetaFilter accent
+    class Results accent
 ```
 
 The `DatasetRetrieval` class in `dataset_retrieval.py` is about 1,800 lines, and it handles both single-dataset retrieval (where an LLM router decides which dataset to query) and multi-dataset retrieval (parallel queries across multiple datasets with result merging).

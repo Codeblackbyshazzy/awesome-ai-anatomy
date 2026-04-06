@@ -1,4 +1,4 @@
-# MiroFish: 50K Stars "Collective Intelligence Prediction Engine" — Crack It Open, It's an LLM Social Simulator With a Big Vision
+# MiroFish: 50K Stars for "Collective Intelligence" — But There's Zero Collective Intelligence Inside
 
 > I expected to find some clever collective intelligence algorithm — particle swarm, ant colony, or at least some evolutionary computation variant. Cloned the repo, read the code. The core prediction capability runs entirely on LLM role-playing + social media simulation. That finding made me rethink what "collective intelligence" means in 2026.
 

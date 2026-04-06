@@ -1,4 +1,4 @@
-# Lightpanda Browser: A From-Scratch Headless Browser in Zig, and What That Actually Means
+# Lightpanda: The Zig Browser That's 9x Faster Than Chrome — Thanks to a Bitcast Trick Nobody Uses
 
 > I spent a week inside 90K lines of Zig to understand what it takes to build a browser engine from zero — not a Chromium fork, not a WebKit patch, but a real parser-to-CDP pipeline written in a language most web developers have never touched.
 

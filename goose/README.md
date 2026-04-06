@@ -62,6 +62,19 @@ graph TB
     ExtMgr --> Builtin
     ExtMgr --> External
     ExtMgr --> Frontend
+
+    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
+    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
+    classDef accent fill:#059669,stroke:#047857,color:#fff
+    classDef warn fill:#d97706,stroke:#b45309,color:#fff
+    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
+
+    class CLI primary
+    class Desktop primary
+    class Agent secondary
+    class ExtMgr secondary
+    class ToolInspection warn
+    class ProviderRegistry accent
 ```
 
 The architecture has three layers. At the top, both CLI and desktop converge on the same `goose-server` (an Axum-based HTTP/WebSocket server). The server manages sessions (SQLite persistence) and hands off messages to the `Agent`. The Agent is the orchestration hub — it owns the prompt manager, extension manager, tool inspection pipeline, and provider connection. Below it, extensions live as MCP clients: some run in-process ("platform extensions"), some spawn as child processes ("builtin" and "stdio"), and some connect over HTTP ("streamable_http").
@@ -218,6 +231,17 @@ graph LR
     BuiltinExt -.->|"McpClient via DuplexStream"| Registry
     StdioExt -.->|"McpClient via TokioChildProcess"| Registry
     HttpExt -.->|"McpClient via StreamableHTTP"| Registry
+
+    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
+    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
+    classDef accent fill:#059669,stroke:#047857,color:#fff
+    classDef warn fill:#d97706,stroke:#b45309,color:#fff
+    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
+
+    class Registry primary
+    class ToolsCache accent
+    class PlatformExt secondary
+    class BuiltinExt secondary
 ```
 
 The `ExtensionManager` maintains a `HashMap<String, Extension>` protected by a `tokio::sync::Mutex`. Each `Extension` wraps a `McpClientBox` (which is `Arc<dyn McpClientTrait>`) plus its config and server info. Tools are cached with an atomic counter for cache invalidation — `tools_cache_version` bumps every time an extension is added or removed, and the cached `Arc<Vec<Tool>>` is only rebuilt when stale.

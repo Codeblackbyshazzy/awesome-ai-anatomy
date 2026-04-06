@@ -1,6 +1,6 @@
 > **Note:** This teardown analyzes code from a source map leak that became publicly available. All analysis is for educational and commentary purposes under fair use. No proprietary code is reproduced in sufficient quantity to substitute for the original work.
 
-# 🔬 Claude Code - Architecture Anatomy
+# 🔬 Claude Code: 510K Lines, a 1729-Line God Object, and 18 Virtual Pet Species Hidden in a Coding Agent
 
 > **The most advanced AI coding agent in production, dissected.**
 > 510,000 lines of TypeScript. 1,903 files. The complete architecture of how Anthropic built an AI that codes autonomously - revealed through an accidental npm source map leak.

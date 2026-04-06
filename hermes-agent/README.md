@@ -1,4 +1,4 @@
-# Hermes Agent: OpenClaw's Python Twin With a Learning Loop Bolted On
+# Hermes Agent: The "OpenClaw Killer" That Ships a `hermes claw migrate` Command
 
 > Someone on HN called Hermes "the OpenClaw killer." I went and read the source code. Turns out it's less "killer" and more "Python rewrite with some good additions."
 
