@@ -10,7 +10,7 @@
 | Forks | 21,259 |
 | Language | Python (backend) + TypeScript (frontend) |
 | Framework | Flask/Gunicorn + Celery + Next.js + ReactFlow |
-| Lines of Code | ~1,240,000 (513K Python + 727K TypeScript) |
+| Lines of Code | ~1,283,000 (513K Python + 770K TypeScript) |
 | License | Modified Apache 2.0 (commercial use >1M users requires license) |
 | First Commit | April 2023 |
 | Latest Release | v1.13.3 (March 27, 2026) |
@@ -296,7 +296,7 @@ Would I use it? For an enterprise team that needs a managed AI platform and has 
 | Deployment Complexity | High (7+ containers, 400+ env vars) | Medium (2 containers) | Low (pip install) |
 | License | Modified Apache 2.0 | MIT | MIT |
 | Target User | Teams / Enterprise | Developers | Individual developers |
-| Lines of Code | ~1,240,000 | ~260,000 (estimated) | ~260,000 |
+| Lines of Code | ~1,283,000 | ~260,000 (estimated) | ~260,000 |
 
 Dify and DeerFlow both have visual workflow editors, but they're solving different problems. DeerFlow is a developer tool — the middleware chain and LangGraph integration give you fine-grained control but assume you'll write code. Dify is a platform — it assumes non-technical users will build workflows and technical users will manage the infrastructure.
 
@@ -392,7 +392,7 @@ Child engines get their own variable pools but share the parent's execution cont
 |-------|-------------------|--------|
 | 136,306 stars | GitHub API (`stargazers_count`) | ✅ Verified |
 | 21,259 forks | GitHub API (`forks_count`) | ✅ Verified |
-| ~1,240,000 LOC (513K Python + 727K TS) | PowerShell `Get-Content \| Measure-Object -Line` | ✅ Verified |
+| ~1,283,000 LOC (513K Python + 770K TS) | PowerShell `Get-Content \| Measure-Object -Line` | ✅ Verified |
 | First commit April 2023 | GitHub API (`created_at: 2023-04-12`) | ✅ Verified |
 | Latest release v1.13.3 | GitHub API releases/latest (`tag_name: 1.13.3`) | ✅ Verified |
 | Modified Apache 2.0 license | `LICENSE` file content | ✅ Verified |

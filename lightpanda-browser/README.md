@@ -176,13 +176,13 @@ pub extern "C" fn html5ever_parse_document(
     append_callback: AppendCallback,
     parse_error_callback: ParseErrorCallback,
     pop_callback: PopCallback,
-    // ... 7 more callbacks
+    // ... 9 more callbacks
 ) -> () {
 ```
 
 The Zig side calls into Rust with a bunch of function pointers. As html5ever parses the HTML and encounters elements, text nodes, doctypes, etc., it calls *back* into Zig through these function pointers. So the data flow is: Zig calls Rust with HTML bytes → Rust parses and calls back Zig for each DOM node → Zig builds its own DOM tree.
 
-This callback-based design means the DOM tree is always owned by Zig. html5ever never builds its own tree — it's purely a tokenizer and tree-construction algorithm that tells Zig what to do via callbacks. The downside is the sheer number of function pointers (16 callbacks per parse call), which makes the API surface fragile. Change any callback signature and you get hard-to-debug FFI errors.
+This callback-based design means the DOM tree is always owned by Zig. html5ever never builds its own tree — it's purely a tokenizer and tree-construction algorithm that tells Zig what to do via callbacks. The downside is the sheer number of function pointers (14 callbacks per parse call), which makes the API surface fragile. Change any callback signature and you get hard-to-debug FFI errors.
 
 They also recently added streaming support (`html5ever_streaming_parser_create/feed/finish`), which lets pages be parsed incrementally as network data arrives. This is important for large pages and for `document.write` support, which needs to inject content mid-parse.
 
@@ -331,7 +331,7 @@ Lightpanda shares its HTML parser (html5ever) with Servo — it's literally the 
 
 ## What I'd Push Back On
 
-**1. The 16-callback FFI boundary with html5ever is brittle.** Each function pointer crossing the Zig-Rust boundary is a potential ABI mismatch. If html5ever's Rust types change, or if Zig's C ABI representation shifts between versions, this breaks silently. There's no type-safety crossing that boundary. A more robust approach would be a message-based protocol or a shared memory structure, but the performance cost might not be worth it at this stage.
+**1. The 14-callback FFI boundary with html5ever is brittle.** Each function pointer crossing the Zig-Rust boundary is a potential ABI mismatch. If html5ever's Rust types change, or if Zig's C ABI representation shifts between versions, this breaks silently. There's no type-safety crossing that boundary. A more robust approach would be a message-based protocol or a shared memory structure, but the performance cost might not be worth it at this stage.
 
 **2. Web API coverage is a marathon they've barely started.** 60-ish Web API implementations sounds like a lot until you realize the full Web API surface is 800+. Every real-world page hits APIs that Lightpanda doesn't have yet. IntersectionObserver is stubbed. ResizeObserver exists but is limited. CORS is unimplemented. Service Workers, Web Workers, WebTransport — all missing. The "works with Playwright" claim needs a large asterisk: it works *for the subset of APIs that are implemented*.
 
@@ -389,9 +389,9 @@ There's a `LP` CDP domain (the only non-standard one) in `domains/lp.zig`. This 
 | BoringSSL for TLS | build.zig buildBoringSsl | ✅ via boringssl-zig |
 | "9x faster, 16x less memory" claim | README benchmarks link | ✅ Links to benchmarks repo |
 | Zig 0.15.2 requirement | build.zig.zon minimum_zig_version | ✅ Verified |
-| MCP server support | src/mcp/ directory (4 files) | ✅ 1,733 lines |
+| MCP server support | src/mcp/ directory (5 files) | ✅ 1,733 lines |
 | No CORS implementation | README status checklist | ✅ Unchecked, issue #2015 |
-| 16 callbacks in html5ever FFI | src/html5ever/lib.rs function signature | ✅ Counted |
+| 14 callbacks in html5ever FFI | src/html5ever/lib.rs function signature | ✅ Counted |
 
 </details>
 
