@@ -1,6 +1,6 @@
 # Guardrails AI: The npm-for-validators Approach to LLM Output Safety
 
-> I went in expecting a security tool. What I found was closer to a package manager with a validation engine bolted on — and that distinction matters more than the branding suggests.
+> Guardrails AI is closer to a package manager with a validation engine bolted on than to a security tool — and that distinction matters more than the branding suggests.
 
 ## At a Glance
 
@@ -344,6 +344,10 @@ def validate_stream(self, chunk: Any, metadata: Dict[str, Any], ...) -> Optional
 ### 3. Validator-as-pip-package Registry
 
 The local JSON registry pattern (`hub_registry.json`) for dynamically installed validators is a clean approach to plugin management. Each validator knows its import path, exports, and installation timestamp. This could be adapted for any plugin system that needs to track dynamically installed components.
+
+### 4. Reask Loop with Budget Ceiling
+
+The `reask` flow re-prompts the LLM with the specific validation failure, but caps retries at a configurable `num_reasks` to prevent infinite loops. The error message sent back to the LLM includes the exact failing field and the validator's error output — not just "try again." This targeted feedback loop is more token-efficient than blind retries and directly applicable to any LLM pipeline where output quality matters.
 
 ---
 

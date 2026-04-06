@@ -371,6 +371,10 @@ class _WorkflowChildEngineBuilder:
 
 Child engines get their own variable pools but share the parent's execution context. This is a clean way to handle nested execution — each iteration has isolated state but shared resource tracking.
 
+### 4. Plugin Daemon as a Separate Process
+
+Dify doesn't load plugins in-process. It runs a Go-based plugin daemon (`dify-plugin-daemon`) as a separate binary, communicating via gRPC. Plugins can crash without taking down the main API server, and the daemon handles its own lifecycle, installation, and sandboxing. If you're building any system with user-contributed extensions, this process isolation pattern is worth the added deployment complexity.
+
 ---
 
 ## Hooks & Easter Eggs

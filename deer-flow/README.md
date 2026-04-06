@@ -319,9 +319,7 @@ Not surprising that Feishu is the best-supported channel, given that DeerFlow co
 
 **If you're building an agent system, invest in a middleware chain.** It's the highest-leverage architectural decision you'll make. Every cross-cutting concern — logging, error handling, cost tracking, safety — becomes a composable, testable, removable unit. DeerFlow has 14+ of them and the codebase is clean because of it.
 
-**Build loop detection before you need it.** Not after your agent burns through your API budget at 2am on a Saturday. DeerFlow's approach (hash tool calls, sliding window, escalating intervention) is simple enough to implement in an afternoon and will save you real money.
-
-**Memory needs more than a text file.** If your agent is going to remember things across sessions, think about structure upfront. What categories of information matter? How confident is the agent in each fact? When should facts expire? DeerFlow's schema isn't perfect, but it's a meaningful step above "append to MEMORY.md."
+**Build loop detection before you need it — and think about memory structure at the same time.** DeerFlow's approach to loops (hash tool calls, sliding window, escalating intervention at 3/5 repeats) is simple enough to implement in an afternoon. Its memory schema — with confidence levels, categories, and expiry — is a meaningful step above "append to MEMORY.md." Both will save you real money and real debugging hours.
 
 ---
 

@@ -1,6 +1,6 @@
 # Pi Mono: The Game Framework Guy Built a Better Claude Code — and Hid a "Stealth Mode" Inside
 
-> I went into this expecting a polished Claude Code clone. What I found instead was a game engine veteran applying scene-graph thinking to LLM provider abstraction, and a "stealth mode" that impersonates Claude Code's tool names to dodge Anthropic's rate limits.
+> Mario Zechner (the libGDX guy) built a Claude Code alternative, and you can tell it's from a game developer. Scene-graph thinking applied to LLM provider abstraction, lazy loading patterns borrowed from texture streaming, and a "stealth mode" that impersonates Claude Code's tool names to dodge Anthropic's rate limits.
 
 ## At a Glance
 

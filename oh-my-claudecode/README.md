@@ -200,9 +200,7 @@ What concerns me: this is a **plugin** that depends on Claude Code's internals. 
 
 **mkdir-based cross-process locking.** If you need to coordinate separate processes and can't use advisory locks (because NFS or Windows), `mkdir` with O_EXCL is atomic everywhere. OMC's implementation with stale lock detection and exponential backoff polling is production-ready.
 
-**Model tier routing.** Assigning Haiku to `critic` (cheap, fast) and Opus to `code-reviewer` (needs deep reasoning) is an obvious optimization that most frameworks don't bother with. The 30-50% token savings claim seems plausible.
-
-**Prompt-as-Markdown separation.** Loading agent prompts from `.md` files instead of hardcoding them in TypeScript means non-engineers can tune agent behavior. Good for teams where the prompt engineer isn't the same person as the developer.
+**Model tier routing with prompt-as-Markdown separation.** Assigning Haiku to `critic` (cheap, fast) and Opus to `code-reviewer` (needs deep reasoning) saves 30-50% on tokens. Pair that with loading agent prompts from `.md` files instead of hardcoding them in TypeScript, and non-engineers can tune agent behavior without touching code. Two low-effort wins that compound.
 
 ---
 

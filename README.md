@@ -6,17 +6,17 @@
   <img src="https://img.shields.io/github/stars/NeuZhou/awesome-ai-anatomy?style=social" alt="Stars">
   <img src="https://img.shields.io/github/forks/NeuZhou/awesome-ai-anatomy?style=social" alt="Forks">
   <img src="https://img.shields.io/badge/teardowns-10-blue" alt="Teardowns">
-  <img src="https://img.shields.io/badge/updated-daily-brightgreen" alt="Updated Daily">
+  <img src="https://img.shields.io/badge/updated-weekly-brightgreen" alt="Updated Weekly">
   <img src="https://img.shields.io/badge/license-MIT-orange" alt="License">
 </p>
 
 # 🔬 Awesome AI Anatomy
 
-**Staff-engineer-level architecture teardowns of the most important AI projects — one per day.**
+**Staff-engineer-level architecture teardowns of the most important AI agent projects — source code analysis, one project at a time.**
 
-Most "awesome" lists link to repos. We **dissect** them — architecture diagrams, design decisions, trade-off analysis, God Object code smells, hidden easter eggs, and engineering insights you won't find in the docs.
+Most "awesome" lists link to repos. We **dissect** them — architecture diagrams, design decisions, trade-off analysis, God Object code smells, hidden easter eggs, and engineering insights you won't find in the docs. Each teardown is a deep-dive code review of a real AI agent codebase.
 
-> ⭐ **Star this repo** to get daily teardowns in your GitHub feed.
+> ⭐ **Star this repo** to get weekly AI agent teardowns in your GitHub feed.
 
 ---
 
@@ -34,11 +34,13 @@ Most "awesome" lists link to repos. We **dissect** them — architecture diagram
 
 ## 📊 Project Index
 
+> 10 AI agent source code analyses — from orchestration frameworks to coding assistants.
+
 | # | Project | Stars | Language | Lines | Key Findings | Status |
 |---|---------|-------|----------|-------|-------------|--------|
 | 001 | [**Dify**](dify/) | 136K ⭐ | Python + TS | 1.24M | Visual workflow builder, `graphon` graph engine extraction, 7+ Docker containers, 30+ vector DB support | ✅ Published |
 | 002 | [**DeerFlow**](deer-flow/) | 58K ⭐ | Python + TS | — | 14-layer middleware chain, hash-based loop detection (warn@3, kill@5), no auth/RBAC | ✅ Published |
-| 003 | [**MiroFish**](mirofish/) | 50K ⭐ | Python + Vue | 39K | LLM-driven social simulation disguised as "collective intelligence," OASIS engine wrapper, ReACT forced-tool-use | ✅ Published |
+| 003 | [**MiroFish**](mirofish/) | 50K ⭐ | Python + Vue | 39K | LLM-driven social simulation marketed as "collective intelligence," OASIS engine wrapper, ReACT forced-tool-use | ✅ Published |
 | 004 | [**Goose**](goose/) | 37K ⭐ | Rust + TS | 198K | MCP-first extension bus, 5-inspector tool inspection pipeline, 30+ LLM providers | ✅ Published |
 | 005 | [**Pi Mono**](pi-mono/) | 32K ⭐ | TypeScript | 147K | Game-engine architecture, stealth mode (impersonates Claude Code), clean 7-package monorepo | ✅ Published |
 | 006 | [**Lightpanda**](lightpanda-browser/) | 27K ⭐ | Zig + Rust | 91K | From-scratch headless browser for AI agents, 9x faster than Chrome, Zig comptime V8 bindings | ✅ Published |
@@ -117,13 +119,21 @@ Found an error? Have a better analysis? PRs welcome!
 
 ## 📌 Stay Updated
 
-This repo is updated daily. **Star ⭐ and Watch 👁️ to follow along.**
+This repo is updated weekly with new AI agent teardowns. **Star ⭐ and Watch 👁️ to follow along.**
 
 - 🐦 Twitter: [@NeuZhou](https://x.com/NeuZhou)
 - 💬 Discord: [Join the community](https://discord.gg/kAQD7Cj8)
 
 ---
 
+## ⚠️ Disclaimer
+
+These teardowns are independent technical commentary for educational purposes. All code snippets are cited under fair use for criticism, commentary, and education. Project names and trademarks belong to their respective owners. Star counts and LOC figures are snapshots at time of writing and may have changed.
+
+If you're a project maintainer and have concerns about any content, please [open an issue](https://github.com/NeuZhou/awesome-ai-anatomy/issues/new).
+
+---
+
 <p align="center">
-  <i>Daily AI architecture insights from a senior engineer's perspective.</i>
+  <i>Weekly AI agent architecture insights from a senior engineer's perspective.</i>
 </p>

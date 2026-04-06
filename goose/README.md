@@ -1,6 +1,6 @@
 # Block/Goose: The Rust Agent That Treats MCP as a First-Class Citizen
 
-> I expected another Claude Code clone with a Rust wrapper. What I found instead was a system where the agent loop is almost secondary — the real architecture is a distributed extension bus built on top of MCP, with the LLM acting as a scheduler. That distinction matters more than the language choice.
+> Goose isn't really a "Rust agent." The agent loop is almost secondary — the real architecture is a distributed extension bus built on top of MCP, with the LLM acting as a scheduler. That distinction matters more than the language choice.
 
 ## At a Glance
 

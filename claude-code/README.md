@@ -1,3 +1,5 @@
+> **Note:** This teardown analyzes code from a source map leak that became publicly available. All analysis is for educational and commentary purposes under fair use. No proprietary code is reproduced in sufficient quantity to substitute for the original work.
+
 # 🔬 Claude Code - Architecture Anatomy
 
 > **The most advanced AI coding agent in production, dissected.**
