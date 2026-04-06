@@ -53,6 +53,19 @@ flowchart LR
         UPL[Uploads & Artifacts]
         MCPC[MCP Config]
     end
+
+    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
+    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
+    classDef accent fill:#059669,stroke:#047857,color:#fff
+    classDef warn fill:#d97706,stroke:#b45309,color:#fff
+    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
+
+    class User primary
+    class MW secondary
+    class LLM secondary
+    class SA accent
+    class SB accent
+    class MCP accent
 ```
 
 The split is straightforward: LangGraph Server handles the stateful agent loop (can run for hours on a single task). Gateway API is stateless REST for everything else — model config, skill management, memory, file uploads.
@@ -85,15 +98,21 @@ flowchart TD
     SL --> CL[ClarificationMiddleware<br/><i>MUST BE LAST</i>]
     CL --> OUT([To LLM])
 
-    style TD fill:#e1f5fe
-    style SB fill:#e1f5fe
-    style SA fill:#e1f5fe
-    style LE fill:#fff3e0
-    style TE fill:#fff3e0
-    style DT fill:#fff3e0
-    style LD fill:#ffebee
-    style SL fill:#ffebee
-    style CL fill:#ffebee
+    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
+    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
+    classDef accent fill:#059669,stroke:#047857,color:#fff
+    classDef warn fill:#d97706,stroke:#b45309,color:#fff
+    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
+
+    class TD accent
+    class SB accent
+    class SA accent
+    class LE warn
+    class TE warn
+    class DT warn
+    class LD secondary
+    class SL secondary
+    class CL secondary
 
 ```
 
@@ -215,8 +234,16 @@ flowchart LR
     F --> JSON
     H --> JSON
 
-    style MM fill:#e1f5fe
-    style LLM fill:#fff3e0
+    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
+    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
+    classDef accent fill:#059669,stroke:#047857,color:#fff
+    classDef warn fill:#d97706,stroke:#b45309,color:#fff
+    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
+
+    class CONV primary
+    class MM secondary
+    class LLM secondary
+    class JSON accent
 ```
 
 The debounced update design is smart — you don't want an LLM call after every single message. But the underlying storage is a single JSON file with `mtime`-based cache invalidation. I didn't see any file locking in the storage layer. If two concurrent threads try to update memory at the same time, I'd bet real money you get a corrupted JSON file. For single-user local deployment this is fine. Multi-tenant? You'd need to rip out the storage layer entirely.

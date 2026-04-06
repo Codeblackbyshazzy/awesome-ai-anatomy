@@ -55,9 +55,18 @@ flowchart TB
     W2 --> CODEX
     W3 --> GEMINI
 
-    style OMC fill:#fff3e0,stroke:#e8590c
-    style TEAM fill:#e8f5e9,stroke:#2e7d32
-    style MULTI fill:#e3f2fd,stroke:#1565c0
+    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
+    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
+    classDef accent fill:#059669,stroke:#047857,color:#fff
+    classDef warn fill:#d97706,stroke:#b45309,color:#fff
+    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
+
+    class OMC primary
+    class LEAD secondary
+    class DISPATCH secondary
+    class CLAUDE accent
+    class CODEX accent
+    class GEMINI accent
 ```
 
 ## File-Based IPC: The Most Interesting Design Decision
@@ -129,9 +138,17 @@ flowchart LR
         DS["doc-specialist"]
     end
 
-    style OPUS fill:#ffebee
-    style SONNET fill:#fff3e0
-    style HAIKU fill:#e8f5e9
+    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
+    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
+    classDef accent fill:#059669,stroke:#047857,color:#fff
+    classDef warn fill:#d97706,stroke:#b45309,color:#fff
+    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
+
+    class CR warn
+    class AR secondary
+    class PL secondary
+    class CT accent
+    class DS accent
 ```
 
 The model routing is the interesting part: simple tasks get Haiku (cheap), complex reasoning gets Opus (expensive), everything else gets Sonnet. The `critic` agent specifically uses Haiku because criticism doesn't need deep reasoning — it just needs to point out problems.

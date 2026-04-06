@@ -42,10 +42,17 @@ graph TB
     CA --> MOM
     AI --> PODS
 
-    style AI fill:#e1f5fe
-    style AGENT fill:#f3e5f5
-    style CA fill:#fff3e0
-    style TUI fill:#e8f5e9
+    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
+    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
+    classDef accent fill:#059669,stroke:#047857,color:#fff
+    classDef warn fill:#d97706,stroke:#b45309,color:#fff
+    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
+
+    class AI primary
+    class AGENT secondary
+    class CA secondary
+    class TUI accent
+    class WEBUI accent
 ```
 
 The stack is layered in a way that'll feel familiar if you've worked with game engines: `pi-ai` is the renderer abstraction (swap OpenGL for Anthropic), `pi-agent-core` is the game loop (stream→toolcall→execute→repeat), `pi-tui` is the scene graph (differential rendering, component hierarchy), and `pi-coding-agent` is the actual game (all the content, modes, UI).
@@ -201,6 +208,17 @@ graph LR
     RUN --> TOOLS
     RUN --> CMDS
     RUN --> PROVIDERS
+
+    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
+    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
+    classDef accent fill:#059669,stroke:#047857,color:#fff
+    classDef warn fill:#d97706,stroke:#b45309,color:#fff
+    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
+
+    class LOAD primary
+    class RUN secondary
+    class EVENTS accent
+    class TOOLS accent
 ```
 
 Pi's extension system has more event types than most agent frameworks have total API surface. Extensions can:

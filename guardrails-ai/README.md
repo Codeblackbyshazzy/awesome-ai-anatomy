@@ -70,6 +70,19 @@ flowchart TB
     Install --> Registry
     Registry -.->|"import_module"| V1
     V1 -.->|"use_local=False"| Remote
+
+    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
+    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
+    classDef accent fill:#059669,stroke:#047857,color:#fff
+    classDef warn fill:#d97706,stroke:#b45309,color:#fff
+    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
+
+    class UC primary
+    class Call secondary
+    class Step secondary
+    class V1 accent
+    class V2 warn
+    class Install accent
 ```
 
 The whole thing flows through a single central class: `Guard`. It holds your validators, your output schema, your execution history, your API client, your telemetry config — everything. When you call it, it builds a `Runner`, which loops through LLM calls and validation steps until the output passes or the reask budget runs out.

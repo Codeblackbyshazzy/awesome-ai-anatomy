@@ -64,6 +64,19 @@ flowchart TB
     ReportAgent --> LLM
     ReportAgent --> ZepCloud
     OASIS --> LLM
+
+    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
+    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
+    classDef accent fill:#059669,stroke:#047857,color:#fff
+    classDef warn fill:#d97706,stroke:#b45309,color:#fff
+    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
+
+    class Step1 primary
+    class SimRunner secondary
+    class ReportAgent secondary
+    class OASIS accent
+    class ZepCloud accent
+    class LLM warn
 ```
 
 MiroFish's architecture breaks into three layers: the outermost is a Vue.js step-by-step wizard UI bundled with Vite, the middle layer is a Flask API, and the bottom layer is a chain of LLM calls.
@@ -206,6 +219,18 @@ flowchart LR
     Twitter & Reddit --> Monitor
     Monitor --> IPC
     IPC --> Report
+
+    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
+    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
+    classDef accent fill:#059669,stroke:#047857,color:#fff
+    classDef warn fill:#d97706,stroke:#b45309,color:#fff
+    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
+
+    class SC primary
+    class Twitter secondary
+    class Reddit secondary
+    class Report accent
+    class Monitor accent
 ```
 
 How the simulation runs: the Flask backend spawns a subprocess running `run_parallel_simulation.py`, which uses `asyncio.gather` to launch Twitter and Reddit platform simulations in parallel. Each platform maintains its own SQLite database recording all agent actions.
