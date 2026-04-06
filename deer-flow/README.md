@@ -2,6 +2,8 @@
 
 > I read through the DeerFlow 2.0 source code to understand what's inside a 58K-star agent harness. Here's what I found, what impressed me, and what didn't.
 
+> **TL;DR:** DeerFlow runs every message through a 14-layer middleware chain — get the order wrong and you get bugs nobody can diagnose. The loop detection (hash-based, warn at 3, kill at 5 repeats) is worth stealing. The security model is "good luck" — no auth, no RBAC, deploy on a public IP and anyone can execute code in your sandbox.
+
 ## At a Glance
 
 | Metric | Value |

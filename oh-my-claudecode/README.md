@@ -2,6 +2,8 @@
 
 > Someone took Claude Code and strapped a 19-agent team orchestration system on top of it. I read through 194K lines of TypeScript to figure out if it works.
 
+> **TL;DR:** oh-my-claudecode coordinates Claude, Codex, and Gemini CLI workers through file-based IPC with mkdir-based locking. 19 specialized agents, model tier routing (Haiku for cheap tasks, Opus for complex), and a plan→exec→verify→fix pipeline. The risk: it's a plugin that depends on Claude Code's internals — one Anthropic release could break everything.
+
 ## At a Glance
 
 | Metric | Value |

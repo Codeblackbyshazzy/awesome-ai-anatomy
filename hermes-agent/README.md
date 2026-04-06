@@ -2,6 +2,8 @@
 
 > Someone on HN called Hermes "the OpenClaw killer." I went and read the source code. Turns out it's less "killer" and more "Python rewrite with some genuinely good additions."
 
+> **TL;DR:** Hermes Agent is OpenClaw rewritten in Python with three additions worth caring about: skills that auto-create and self-improve from experience, FTS5 session search for cross-session recall, and frozen memory snapshots that preserve your prompt cache. It also ships a `hermes claw migrate` command, which tells you everything about where the code came from.
+
 ## At a Glance
 
 | Metric | Value |
@@ -67,6 +69,23 @@ The entire agent loop lives in one file: `run_agent.py` at 9,000+ lines. I ran `
 ## The Learning Loop: The One Thing That's Actually New
 
 The marketing says "self-improving." I was skeptical. But after reading the skill manager code, I'll admit: the implementation is more solid than I expected. The learning loop has three components:
+
+```mermaid
+flowchart LR
+    TASK["Complex Task\nCompleted"] --> CREATE["Auto-Create Skill\n(SKILL.md)"]
+    CREATE --> SCAN1["Security Scan\n(skills_guard.py)"]
+    SCAN1 -->|pass| ACTIVATE["Skill Activated"]
+    ACTIVATE --> USE["Skill Used\nNext Time"]
+    USE --> PATCH["Agent Patches Skill\n(find-and-replace)"]
+    PATCH --> SCAN2["Re-Scan Security"]
+    SCAN2 -->|pass| IMPROVED["Improved Skill"]
+    IMPROVED --> USE
+
+    style SCAN1 fill:#ffebee
+    style SCAN2 fill:#ffebee
+    style CREATE fill:#e8f5e9
+    style PATCH fill:#fff3e0
+```
 
 ### 1. Autonomous Skill Creation
 
@@ -186,6 +205,20 @@ The no-memory-writes constraint is worth calling out. In DeerFlow, subagents sha
 ## Context Compression
 
 I spent a while on the `ContextCompressor` because I've burned money on context overflow before. This module does it right — five-step algorithm:
+
+```mermaid
+flowchart TD
+    MSG["Message History\n(approaching limit)"] --> S1["Step 1: Prune Tool Results\n(cheap, no LLM)"]
+    S1 --> S2["Step 2: Protect Head\n(system prompt + 1st exchange)"]
+    S2 --> S3["Step 3: Protect Tail\n(last ~20K tokens verbatim)"]
+    S3 --> S4["Step 4: Summarize Middle\n(Goal/Progress/Decisions/Files/Next)"]
+    S4 --> S5["Step 5: Iterative Update\n(refine prev summary, don't regenerate)"]
+    S5 --> OUT["Compressed Context\n(head + summary + tail)"]
+
+    style S1 fill:#e8f5e9
+    style S4 fill:#fff3e0
+    style S5 fill:#fff3e0
+```
 
 1. **Prune old tool results** — cheap pre-pass, no LLM call. Old tool outputs get replaced with `[Old tool output cleared to save context space]`
 2. **Protect the head** — system prompt + first exchange are never summarized
