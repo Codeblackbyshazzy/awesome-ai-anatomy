@@ -12,16 +12,17 @@
 
 # 🔬 Awesome AI Anatomy
 
-**Staff-engineer-level architecture teardowns of the most important AI agent projects — source code analysis, one project at a time.**
+**We read 2.5M lines of AI agent source code so you don't have to. 10 projects dissected. Some had hidden pet systems. Some had zero security. All had God Objects.**
 
-Most "awesome" lists link to repos. We **dissect** them — architecture diagrams, design decisions, trade-off analysis, God Object code smells, hidden easter eggs, and engineering insights you won't find in the docs. Each teardown is a deep-dive code review of a real AI agent codebase.
+Claude Code ships 18 virtual pet species in production. Pi Mono can impersonate Claude Code to dodge rate limits. MiroFish's "collective intelligence" is just LLMs role-playing on a fake social network. These aren't hot takes — they're findings from reading every line of code.
 
-> ⭐ **Star this repo** to get weekly AI agent teardowns in your GitHub feed.
+Most "awesome" lists link to repos. We crack them open — architecture diagrams, design trade-offs, code smells, security gaps, and the engineering decisions nobody talks about in the docs.
 
 ---
 
 ## 📋 Table of Contents
 
+- [Greatest Hits](#-greatest-hits)
 - [Project Index](#-project-index)
 - [Cross-Project Comparison](#-cross-project-comparison)
 - [What Makes This Different](#-what-makes-this-different)
@@ -29,6 +30,22 @@ Most "awesome" lists link to repos. We **dissect** them — architecture diagram
 - [Coming Next](#️-coming-next)
 - [Contributing](#-contributing)
 - [Stay Updated](#-stay-updated)
+
+---
+
+## 🔥 Greatest Hits
+
+The 5 findings people can't stop sharing:
+
+| # | Finding | Project | Why It Matters |
+|---|---------|---------|---------------|
+| 1 | **Claude Code ships 18 virtual pet species** — a full tamagotchi system hidden in a coding agent | [Claude Code](claude-code/) | What else is hiding in tools you run with `sudo`? |
+| 2 | **Pi Mono's "stealth mode" impersonates Claude Code** — fakes tool names to dodge rate limits | [Pi Mono](pi-mono/) | Open-source projects gaming API providers is a trend |
+| 3 | **MiroFish's "collective intelligence" = zero collective intelligence** — it's LLMs role-playing humans on a simulated social network | [MiroFish](mirofish/) | 50K stars built on marketing, not on the tech the name promises |
+| 4 | **Lightpanda's bitcast dispatch** makes Zig act like a language with vtables — a systems trick we'd never seen before | [Lightpanda](lightpanda-browser/) | Zig comptime metaprogramming pushed to its limits |
+| 5 | **DeerFlow's orphan tool call bug** — 93 lines of code fix a crash that affects every LangGraph-based agent | [DeerFlow](deer-flow/) | If you use LangGraph, you probably have this bug too |
+
+> These are real findings from reading source code, not vibes from README files.
 
 ---
 
@@ -47,9 +64,9 @@ Most "awesome" lists link to repos. We **dissect** them — architecture diagram
 | 007 | [**Hermes Agent**](hermes-agent/) | 26K ⭐ | Python | 260K | OpenClaw's Python twin, self-improving skill system, FTS5 session search, frozen memory snapshots | ✅ Published |
 | 008 | [**oh-my-claudecode**](oh-my-claudecode/) | 24K ⭐ | TypeScript | 194K | 19-agent team orchestration via file-based IPC, model tier routing (Haiku→Opus), Claude Code plugin | ✅ Published |
 | 009 | [**Guardrails AI**](guardrails-ai/) | 6.6K ⭐ | Python | 18K | npm-for-validators Hub model, reask loop for LLM self-correction, 1076-line Guard God Object | ✅ Published |
-| 010 | [**Claude Code**](claude-code/) | N/A (proprietary) | TypeScript | 510K | 4-layer context management, streaming tool execution, hidden pet system (18 species!), 1729-line God Object | ✅ Published |
+| 010 | [**Claude Code**](claude-code/) | 109K ⭐ | TypeScript | 510K | 4-layer context management, streaming tool execution, hidden pet system (18 species!), 1729-line God Object | ✅ Published |
 
-> Projects sorted by GitHub stars (descending). Claude Code is proprietary (leaked via source map) so stars are N/A.
+> Projects sorted by GitHub stars (descending).
 
 ---
 
@@ -85,9 +102,6 @@ We maintain a detailed **[COMPARISON.md](COMPARISON.md)** with side-by-side anal
 
 ```
 📄 README.md          — Full architecture analysis + design decisions
-📊 *.mmd              — Mermaid diagram source files (select teardowns)
-🎬 video-script-*.md  — Video scripts (select teardowns)
-🖼️ slides-guide.md    — Slide deck content guide (select teardowns)
 ⚠️ Problems found     — Bugs, code smells, architectural risks
 🆚 Comparisons        — How it stacks up against alternatives
 ```
@@ -119,10 +133,16 @@ Found an error? Have a better analysis? PRs welcome!
 
 ## 📌 Stay Updated
 
-This repo is updated weekly with new AI agent teardowns. **Star ⭐ and Watch 👁️ to follow along.**
+New teardown every week. We're working through the top AI agent projects — Cursor, Windsurf, and others are on the list.
 
-- 🐦 Twitter: [@NeuZhou](https://x.com/NeuZhou)
-- 💬 Discord: [Join the community](https://discord.gg/kAQD7Cj8)
+**⭐ Star this repo** → GitHub will notify you when new teardowns drop. That's literally what the star button does — it's a subscribe button, not a vanity metric.
+
+**👁️ Watch** → Get notified for every new teardown, not just the ones that trend.
+
+We've published 10 deep-dives covering 2.5M lines of source code. The next 10 are already in progress.
+
+- 🐦 Twitter: [@NeuZhou](https://x.com/NeuZhou) — teardown threads and findings
+- 💬 Discord: [Join the community](https://discord.gg/kAQD7Cj8) — discuss architecture decisions
 
 ---
 

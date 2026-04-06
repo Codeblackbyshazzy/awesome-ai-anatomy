@@ -57,6 +57,19 @@ graph TB
 
     CDP --> |"notifications"| Notification["Notification.zig<br/>(event bus)"]
     Notification --> Page
+
+    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
+    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
+    classDef accent fill:#059669,stroke:#047857,color:#fff
+    classDef warn fill:#d97706,stroke:#b45309,color:#fff
+    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
+
+    class Main primary
+    class Page secondary
+    class CDP secondary
+    class V8 accent
+    class H5E accent
+    class Network accent
 ```
 
 The architecture is a straightforward pipeline: network data comes in through libcurl, gets parsed by html5ever into a DOM tree managed entirely in Zig, V8 runs JavaScript against that DOM through a binding layer, and CDP exposes all of this to external tools like Playwright and Puppeteer.
@@ -153,6 +166,17 @@ flowchart LR
     CAST --> SWITCH["switch(u32)"]
     SWITCH --> |"match"| PAGE["domains/page.zig"]
     SWITCH --> |"no match"| ERR["UnknownDomain"]
+
+    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
+    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
+    classDef accent fill:#059669,stroke:#047857,color:#fff
+    classDef warn fill:#d97706,stroke:#b45309,color:#fff
+    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
+
+    class MSG primary
+    class SWITCH secondary
+    class PAGE accent
+    class ERR warn
 ```
 
 Is this worth the cleverness? For a hot path that processes every CDP message, and given that there are only 15 domains right now, probably yes. The domain names are all ASCII and bounded in length (max 13 chars for "Accessibility"), so the integer casts are safe. It's a micro-optimization that happens to also be readable once you understand the pattern.

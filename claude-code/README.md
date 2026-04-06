@@ -16,7 +16,7 @@
 
 | Metric | Value |
 |--------|-------|
-| Stars | N/A (leaked source, not an open-source release) |
+| Stars | 109,546 (as of April 2026; originally analyzed from leaked source maps before public release) |
 | Language | TypeScript |
 | Lines of Code | ~510K (1,903 files) |
 | Framework | Bun, React/Ink, Zod v4 |
