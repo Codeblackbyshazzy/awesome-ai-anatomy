@@ -108,7 +108,7 @@ We maintain a detailed **[COMPARISON.md](COMPARISON.md)** with side-by-side anal
 
 ---
 
-Video walkthroughs coming soon — follow [@NeuZhou](https://x.com/NeuZhou) on Twitter for updates.
+Video walkthroughs coming soon — follow [@justboy1987](https://x.com/justboy1987) on Twitter for updates.
 
 ---
 
@@ -141,7 +141,7 @@ New teardown every week. We're working through the top AI agent projects — Cur
 
 We've published 10 deep-dives covering 2.5M lines of source code. The next 10 are already in progress.
 
-- 🐦 Twitter: [@NeuZhou](https://x.com/NeuZhou) — teardown threads and findings
+- 🐦 Twitter: [@justboy1987](https://x.com/justboy1987) — teardown threads and findings
 - 💬 Discord: [Join the community](https://discord.gg/kAQD7Cj8) — discuss architecture decisions
 
 ---
