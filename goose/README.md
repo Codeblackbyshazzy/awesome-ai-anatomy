@@ -21,6 +21,11 @@ Goose is an on-machine AI agent that runs shell commands, edits files, manages e
 
 ## Architecture
 
+![Architecture](architecture.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 graph LR
     subgraph Entry["Entry Points"]
@@ -76,6 +81,8 @@ graph LR
     class ToolInspection warn
     class ProviderRegistry accent
 ```
+
+</details>
 
 The architecture has three layers. At the top, both CLI and desktop converge on the same `goose-server` (an Axum-based HTTP/WebSocket server). The server manages sessions (SQLite persistence) and hands off messages to the `Agent`. The Agent is the orchestration hub — it owns the prompt manager, extension manager, tool inspection pipeline, and provider connection. Below it, extensions live as MCP clients: some run in-process ("platform extensions"), some spawn as child processes ("builtin" and "stdio"), and some connect over HTTP ("streamable_http").
 

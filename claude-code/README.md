@@ -50,6 +50,11 @@
 
 ## Architecture Overview
 
+![Architecture](architecture.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 graph LR
     subgraph Entry["🚀 CLI Entry"]
@@ -100,6 +105,8 @@ graph LR
     class Bash accent
     class MCP accent
 ```
+
+</details>
 
 ---
 
