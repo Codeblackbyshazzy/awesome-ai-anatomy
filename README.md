@@ -1,7 +1,7 @@
 <p align="center">
   <img src="https://img.shields.io/github/stars/NeuZhou/awesome-ai-anatomy?style=social" alt="Stars">
   <img src="https://img.shields.io/github/forks/NeuZhou/awesome-ai-anatomy?style=social" alt="Forks">
-  <img src="https://img.shields.io/badge/teardowns-1-blue" alt="Teardowns">
+  <img src="https://img.shields.io/badge/teardowns-2-blue" alt="Teardowns">
   <img src="https://img.shields.io/badge/updated-daily-brightgreen" alt="Updated Daily">
   <img src="https://img.shields.io/badge/license-MIT-orange" alt="License">
 </p>
@@ -33,10 +33,11 @@ Most "awesome" lists link to repos. We **dissect** them — architecture diagram
 | # | Project | Lines | Key Findings | Status |
 |---|---------|-------|-------------|--------|
 | 001 | [**Claude Code**](claude-code/) | 510K TS | 4-layer context management, streaming tool execution, hidden pet system (18 species!), 1729-line God Object | ✅ Published |
-| 002 | **DeerFlow** (ByteDance) | TBD | Coming soon | 🔜 Next |
-| 003 | **Cursor** | TBD | — | 📋 Planned |
-| 004 | **Dify** | TBD | — | 📋 Planned |
-| 005 | **AutoGPT** | TBD | — | 📋 Planned |
+| 002 | [**Guardrails AI**](guardrails-ai/) | 18K Python | npm-for-validators Hub model, RAIL XML dead weight, 1076-line Guard God Object, reask loop, ClawGuard comparison | ✅ Published |
+| 003 | **DeerFlow** (ByteDance) | TBD | Coming soon | 🔜 Next |
+| 004 | **Cursor** | TBD | — | 📋 Planned |
+| 005 | **Dify** | TBD | — | 📋 Planned |
+| 006 | **AutoGPT** | TBD | — | 📋 Planned |
 
 ---
 
