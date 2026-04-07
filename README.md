@@ -3,6 +3,10 @@
 </p>
 
 <p align="center">
+  <b>English</b> | <a href="README.zh-CN.md">简体中文</a>
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/github/stars/NeuZhou/awesome-ai-anatomy?style=social" alt="Stars">
   <img src="https://img.shields.io/github/forks/NeuZhou/awesome-ai-anatomy?style=social" alt="Forks">
   <img src="https://img.shields.io/badge/teardowns-10-blue" alt="Teardowns">
