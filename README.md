@@ -9,14 +9,14 @@
 <p align="center">
   <img src="https://img.shields.io/github/stars/NeuZhou/awesome-ai-anatomy?style=social" alt="Stars">
   <img src="https://img.shields.io/github/forks/NeuZhou/awesome-ai-anatomy?style=social" alt="Forks">
-  <img src="https://img.shields.io/badge/teardowns-10-blue" alt="Teardowns">
+  <img src="https://img.shields.io/badge/teardowns-11-blue" alt="Teardowns">
   <img src="https://img.shields.io/badge/updated-weekly-brightgreen" alt="Updated Weekly">
   <img src="https://img.shields.io/badge/license-MIT-orange" alt="License">
 </p>
 
 # 🔬 Awesome AI Anatomy
 
-**We read 2.5M lines of AI agent source code so you don't have to. 10 projects dissected. Some had hidden pet systems. Some had zero security. All had God Objects.**
+**We read 3M+ lines of AI agent source code so you don't have to. 11 projects dissected. Some had hidden pet systems. Some had zero security. All had God Objects.**
 
 Claude Code ships 18 virtual pet species in production. Pi Mono can impersonate Claude Code to dodge rate limits. MiroFish's "collective intelligence" is just LLMs role-playing on a fake social network. These aren't hot takes — they're findings from reading every line of code.
 
@@ -55,20 +55,21 @@ The 5 findings people can't stop sharing:
 
 ## 📊 Project Index
 
-> 10 AI agent source code analyses — from orchestration frameworks to coding assistants.
+> 11 AI agent source code analyses — from orchestration frameworks to coding assistants.
 
 | # | Project | Stars | Language | Lines | Key Findings | Status |
 |---|---------|-------|----------|-------|-------------|--------|
 | 001 | [**Dify**](dify/) | 136K ⭐ | Python + TS | 1.24M | `graphon` engine, 7+ containers, 30+ vector DBs | ✅ Published |
-| 002 | [**DeerFlow**](deer-flow/) | 58K ⭐ | Python + TS | — | 14-layer middleware, hash loop kill@5, no RBAC | ✅ Published |
-| 003 | [**MiroFish**](mirofish/) | 50K ⭐ | Python + Vue | 39K | LLM social sim as "collective intelligence" | ✅ Published |
-| 004 | [**Goose**](goose/) | 37K ⭐ | Rust + TS | 198K | MCP-first bus, 5-inspector pipeline, 30+ LLMs | ✅ Published |
-| 005 | [**Pi Mono**](pi-mono/) | 32K ⭐ | TypeScript | 147K | Game-engine arch, stealth mode as Claude Code | ✅ Published |
-| 006 | [**Lightpanda**](lightpanda-browser/) | 27K ⭐ | Zig + Rust | 91K | From-scratch browser for AI agents, 9× Chrome | ✅ Published |
-| 007 | [**Hermes Agent**](hermes-agent/) | 26K ⭐ | Python | 260K | Self-improving skills, FTS5 search, frozen mem | ✅ Published |
-| 008 | [**oh-my-claudecode**](oh-my-claudecode/) | 24K ⭐ | TypeScript | 194K | 19-agent team via file IPC, Haiku→Opus routing | ✅ Published |
-| 009 | [**Guardrails AI**](guardrails-ai/) | 6.6K ⭐ | Python | 18K | Validator Hub, reask self-correction loop | ✅ Published |
-| 010 | [**Claude Code**](claude-code/) | 109K ⭐ | TypeScript | 510K | 4-layer context, hidden pet system (18 species) | ✅ Published |
+| 002 | [**Claude Code**](claude-code/) | 109K ⭐ | TypeScript | 510K | 4-layer context, hidden pet system (18 species) | ✅ Published |
+| 003 | [**DeerFlow**](deer-flow/) | 58K ⭐ | Python + TS | — | 14-layer middleware, hash loop kill@5, no RBAC | ✅ Published |
+| 004 | [**MiroFish**](mirofish/) | 50K ⭐ | Python + Vue | 39K | LLM social sim as "collective intelligence" | ✅ Published |
+| 005 | [**Goose**](goose/) | 37K ⭐ | Rust + TS | 198K | MCP-first bus, 5-inspector pipeline, 30+ LLMs | ✅ Published |
+| 006 | [**Pi Mono**](pi-mono/) | 32K ⭐ | TypeScript | 147K | Game-engine arch, stealth mode as Claude Code | ✅ Published |
+| 007 | [**Lightpanda**](lightpanda-browser/) | 27K ⭐ | Zig + Rust | 91K | From-scratch browser for AI agents, 9× Chrome | ✅ Published |
+| 008 | [**Hermes Agent**](hermes-agent/) | 26K ⭐ | Python | 260K | Self-improving skills, FTS5 search, frozen mem | ✅ Published |
+| 009 | [**oh-my-claudecode**](oh-my-claudecode/) | 24K ⭐ | TypeScript | 194K | 19-agent team via file IPC, Haiku→Opus routing | ✅ Published |
+| 010 | [**Guardrails AI**](guardrails-ai/) | 6.6K ⭐ | Python | 18K | Validator Hub, reask self-correction loop | ✅ Published |
+| 011 | [**OpenAI Codex CLI**](codex-cli/) | 27K+ ⭐ | Rust | 549K | Queue-pair arch, Guardian AI approval, 3-OS sandbox | ✅ **NEW** |
 
 > Projects sorted by GitHub stars (descending).
 
@@ -76,12 +77,21 @@ The 5 findings people can't stop sharing:
 
 ## 🆚 Cross-Project Comparison
 
-We maintain a detailed **[COMPARISON.md](COMPARISON.md)** with side-by-side analysis across all 10 projects:
+We maintain a detailed **[COMPARISON.md](COMPARISON.md)** with side-by-side analysis across all 11 projects:
 
 - Quick Reference (creator, stars, language, type, license)
 - Architecture patterns (agent loop, extensibility, deployment)
 - Multi-agent & orchestration approaches
 - Memory & persistence strategies
+
+We also have a new **[CROSS-CUTTING.md](CROSS-CUTTING.md)** — a deep horizontal analysis covering:
+
+- Architecture pattern taxonomy across all projects
+- Context management strategies compared
+- Tool system design patterns
+- Security ratings (A-F grading)
+- Anti-pattern catalog with evidence
+- "Build from scratch" recommendations
 - Safety & security postures
 - Design patterns and anti-patterns found
 - "If I Were Building an Agent Today" synthesis
