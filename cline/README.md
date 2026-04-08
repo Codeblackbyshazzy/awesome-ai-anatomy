@@ -144,17 +144,17 @@ Tools are registered through `ToolExecutorCoordinator`, which maintains a `Map<s
 ```typescript
 // From src/core/task/tools/ToolExecutorCoordinator.ts
 export interface IToolHandler {
-    readonly name: ClineDefaultTool
-    execute(config: TaskConfig, block: ToolUse): Promise<ToolResponse>
-    getDescription(block: ToolUse): string
+ readonly name: ClineDefaultTool
+ execute(config: TaskConfig, block: ToolUse): Promise<ToolResponse>
+ getDescription(block: ToolUse): string
 }
 
 export interface IPartialBlockHandler {
-    handlePartialBlock(block: ToolUse, uiHelpers: StronglyTypedUIHelpers): Promise<void>
+ handlePartialBlock(block: ToolUse, uiHelpers: StronglyTypedUIHelpers): Promise<void>
 }
 
 export interface IFullyManagedTool extends IToolHandler, IPartialBlockHandler {
-    // Marker interface for tools that handle their own complete approval flow
+ // Marker interface for tools that handle their own complete approval flow
 }
 ```
 
@@ -165,9 +165,9 @@ The `TaskConfig` object passed to every handler is a 50+ field configuration bag
 ```typescript
 // From src/core/task/tools/ToolExecutorCoordinator.ts
 [ClineDefaultTool.FILE_EDIT]: (v: ToolValidator) =>
-    new SharedToolHandler(ClineDefaultTool.FILE_EDIT, new WriteToFileToolHandler(v)),
+ new SharedToolHandler(ClineDefaultTool.FILE_EDIT, new WriteToFileToolHandler(v)),
 [ClineDefaultTool.NEW_RULE]: (v: ToolValidator) =>
-    new SharedToolHandler(ClineDefaultTool.NEW_RULE, new WriteToFileToolHandler(v)),
+ new SharedToolHandler(ClineDefaultTool.NEW_RULE, new WriteToFileToolHandler(v)),
 ```
 
 **Comparison with Claude Code:** Claude Code uses `buildTool()` — a pure function factory where each tool is self-contained (schema, permissions, execution, UI rendering, context summary). Cline's handlers are classes that receive a massive config object and use callbacks to communicate with the Task. Claude Code's approach is cleaner for isolation; Cline's approach gives handlers more power but creates tight coupling.
@@ -187,10 +187,10 @@ Each provider implements the `ApiHandler` interface:
 ```typescript
 // From src/core/api/index.ts
 export interface ApiHandler {
-    createMessage(systemPrompt: string, messages: ClineStorageMessage[], tools?: ClineTool[]): ApiStream
-    getModel(): ApiHandlerModel
-    getApiStreamUsage?(): Promise<ApiStreamUsageChunk | undefined>
-    abort?(): void
+ createMessage(systemPrompt: string, messages: ClineStorageMessage[], tools?: ClineTool[]): ApiStream
+ getModel(): ApiHandlerModel
+ getApiStreamUsage?(): Promise<ApiStreamUsageChunk | undefined>
+ abort?(): void
 }
 ```
 
@@ -216,10 +216,10 @@ When a tool needs user permission, the `Task.ask()` method:
 ```typescript
 // From src/core/task/index.ts (simplified)
 await pWaitFor(
-    () => this.taskState.askResponse !== undefined ||
-          this.taskState.lastMessageTs !== askTs ||
-          (shouldWakeOnAbort && this.taskState.abort),
-    { interval: 100 },
+ () => this.taskState.askResponse !== undefined ||
+ this.taskState.lastMessageTs !== askTs ||
+ (shouldWakeOnAbort && this.taskState.abort),
+ { interval: 100 },
 )
 ```
 
@@ -243,11 +243,11 @@ Cline's approach is simpler: **delete old messages from the conversation history
 The `getNextTruncationRange` method calculates which messages to mask out by advancing the `conversationHistoryDeletedRange` tuple. The "quarter" strategy removes roughly a quarter of the remaining undeleted messages. Messages aren't actually deleted from disk — they're masked by tracking `[startIndex, endIndex]` of the deleted range.
 
 ```
-Full history:    [msg0, msg1, msg2, msg3, msg4, msg5, msg6, msg7, msg8, msg9]
-Deleted range:   [0, 3]
-Sent to API:     [msg4, msg5, msg6, msg7, msg8, msg9]
-After overflow:  Deleted range becomes [0, 5]
-Sent to API:     [msg6, msg7, msg8, msg9]
+Full history: [msg0, msg1, msg2, msg3, msg4, msg5, msg6, msg7, msg8, msg9]
+Deleted range: [0, 3]
+Sent to API: [msg4, msg5, msg6, msg7, msg8, msg9]
+After overflow: Deleted range becomes [0, 5]
+Sent to API: [msg6, msg7, msg8, msg9]
 ```
 
 **Auto-condense (next-gen models only):** For Claude 4+ and GPT-5 family models, Cline supports `useAutoCondense` — when the context window reaches ~75% utilization, it asks the model to summarize the conversation using the `summarize_task` tool. This produces a compressed version that replaces the old messages. It's closer to Claude Code's L3/L4 but less sophisticated — there's no structured archival, no importance scoring, no tiered cascade.
@@ -311,9 +311,9 @@ The default agent role is straightforward:
 ```typescript
 // From src/core/prompts/system-prompt/components/agent_role.ts
 const AGENT_ROLE = [
-    "You are Cline,",
-    "a highly skilled software engineer",
-    "with extensive knowledge in many programming languages, frameworks, design patterns, and best practices.",
+ "You are Cline,",
+ "a highly skilled software engineer",
+ "with extensive knowledge in many programming languages, frameworks, design patterns, and best practices.",
 ]
 ```
 
@@ -337,10 +337,10 @@ The `SubagentRunner` manages a mini agent loop:
 ```typescript
 // From src/core/task/tools/subagent/SubagentRunner.ts (conceptual)
 while (true) {
-    // Build system prompt for subagent (reduced tool set)
-    // Call API with subagent-specific context
-    // Parse and execute tools
-    // Return result to parent
+ // Build system prompt for subagent (reduced tool set)
+ // Call API with subagent-specific context
+ // Parse and execute tools
+ // Return result to parent
 }
 ```
 
@@ -376,7 +376,7 @@ The `browser_action` tool provides 6 actions: `launch`, `click`, `type`, `scroll
 `McpHub` (`src/services/mcp/McpHub.ts`, 1,700+ lines) is a full-featured MCP client that manages connections to multiple MCP servers simultaneously. It supports:
 
 - **Transport types:** stdio, SSE, Streamable HTTP
-- **OAuth support** via `McpOAuthManager`  
+- **OAuth support** via `McpOAuthManager` 
 - **Configuration** via a JSON settings file (`.cline/mcp_settings.json`) with file watching
 - **Capabilities:** tools, resources, resource templates, prompts
 - **Auto-reconnect** for SSE connections via `StreamableHttpReconnectHandler`
@@ -413,29 +413,29 @@ The `ToolExecutor` constructor takes 30+ parameters, 15 of which are callback fu
 ```typescript
 // From src/core/task/ToolExecutor.ts (actual parameter list, abbreviated)
 constructor(
-    private taskState: TaskState,
-    private messageStateHandler: MessageStateHandler,
-    private api: ApiHandler,
-    private urlContentFetcher: UrlContentFetcher,
-    private browserSession: BrowserSession,
-    private diffViewProvider: DiffViewProvider,
-    private mcpHub: McpHub,
-    // ... 8 more services ...
-    private say: (...) => Promise<...>,
-    private ask: (...) => Promise<...>,
-    private saveCheckpoint: (...) => Promise<void>,
-    private sayAndCreateMissingParamError: (...) => Promise<any>,
-    private removeLastPartialMessageIfExistsWithType: (...) => Promise<void>,
-    private executeCommandTool: (...) => Promise<...>,
-    private cancelBackgroundCommand: () => Promise<boolean>,
-    private doesLatestTaskCompletionHaveNewChanges: () => Promise<boolean>,
-    private updateFCListFromToolResponse: (...) => Promise<void>,
-    private switchToActMode: () => Promise<boolean>,
-    private cancelTask: () => Promise<void>,
-    private setActiveHookExecution: (...) => Promise<void>,
-    private clearActiveHookExecution: () => Promise<void>,
-    private getActiveHookExecution: () => Promise<...>,
-    private runUserPromptSubmitHook: (...) => Promise<...>,
+ private taskState: TaskState,
+ private messageStateHandler: MessageStateHandler,
+ private api: ApiHandler,
+ private urlContentFetcher: UrlContentFetcher,
+ private browserSession: BrowserSession,
+ private diffViewProvider: DiffViewProvider,
+ private mcpHub: McpHub,
+ // ... 8 more services ...
+ private say: (...) => Promise<...>,
+ private ask: (...) => Promise<...>,
+ private saveCheckpoint: (...) => Promise<void>,
+ private sayAndCreateMissingParamError: (...) => Promise<any>,
+ private removeLastPartialMessageIfExistsWithType: (...) => Promise<void>,
+ private executeCommandTool: (...) => Promise<...>,
+ private cancelBackgroundCommand: () => Promise<boolean>,
+ private doesLatestTaskCompletionHaveNewChanges: () => Promise<boolean>,
+ private updateFCListFromToolResponse: (...) => Promise<void>,
+ private switchToActMode: () => Promise<boolean>,
+ private cancelTask: () => Promise<void>,
+ private setActiveHookExecution: (...) => Promise<void>,
+ private clearActiveHookExecution: () => Promise<void>,
+ private getActiveHookExecution: () => Promise<...>,
+ private runUserPromptSubmitHook: (...) => Promise<...>,
 )
 ```
 
