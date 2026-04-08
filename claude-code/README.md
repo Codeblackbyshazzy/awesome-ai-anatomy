@@ -62,13 +62,10 @@
 
 ## Architecture Overview
 
+
+![Architecture Overview](claude-code-1.png)
+
 ![Architecture](architecture.png)
-
-<!-- Additional architecture diagrams -->
-
-![Diagram 1](claude-code-1.png)
-
-
 ![Diagram 2](claude-code-2.png)
 
 
@@ -122,6 +119,9 @@ If I were leading the next architecture review, I'd split it into three modules:
 
 ## Core Innovation: Context Management - 4 Surgical Layers
 
+
+![Core Innovation: Context Management - 4 Surgical Layers](claude-code-2.png)
+
 This is the most sophisticated part of the codebase. Most agents use a single "summarize and truncate" approach. Claude Code uses four mechanisms, applied in cascade:
 
 
@@ -137,6 +137,9 @@ Layer 1 only removes irrelevant messages - zero information distortion. Layer 2 
 
 ## Streaming Tool Execution - Why Claude Code Feels Fast
 
+
+
+![Streaming Tool Execution - Why Claude Code Feels Fast](claude-code-3.png)
 
 **Key design:** Read-only tools run in parallel. Write tools get exclusive locks. Results are buffered in receive order.
 
@@ -219,6 +222,9 @@ This team uses research methodology in production engineering. They can quantify
 
 ## Multi-Agent Coordination
 
+
+
+![Multi-Agent Coordination](claude-code-4.png)
 
 Workers cannot create sub-workers - prevents resource explosion. Three backends: tmux panes, in-process, remote.
 
