@@ -57,6 +57,13 @@ Cline is a VS Code extension that puts an AI coding agent in your sidebar. You d
 
 ## Architecture Overview
 
+![Cline Architecture](architecture.png)
+
+*Architecture diagram ([source .d2](architecture.d2)) — Red highlights the 3,756-line God Object at the center of the system. Dashed red line shows the polling-based approval flow between Task and the VS Code webview.*
+
+<details>
+<summary>Mermaid version (click to expand)</summary>
+
 ```mermaid
 graph LR
     subgraph Entry["VS Code Extension"]
@@ -107,6 +114,8 @@ graph LR
     Ctrl --> State
     Prompts --> Rules & Skills
 ```
+
+</details>
 
 The architecture is a four-layer hierarchy: **Extension → Controller → Task → ToolExecutor**. The VS Code extension entry point (`extension.ts`, 440 lines) sets up the host provider and registers commands. `common.ts` handles cross-platform initialization. The `Controller` manages task lifecycle, MCP servers, auth, and state. The `Task` class is where 80% of the complexity lives — it orchestrates the entire agent loop, streaming, context management, hooks, checkpoints, and tool execution.
 
