@@ -33,57 +33,6 @@ Dify is a platform for building AI applications through a visual drag-and-drop i
 
 ![Architecture](architecture.png)
 
-<details>
-<summary>Mermaid source (click to expand)</summary>
-
-```mermaid
-flowchart LR
-    User([User / Browser]) --> Nginx[Nginx Reverse Proxy :80]
-    Nginx -->|/api/*| API["API Server\n(Flask + Gunicorn :5001)"]
-    Nginx -->|static| Web["Next.js Frontend\n(:3000)"]
-
-    API --> Redis[(Redis)]
-    API --> PG[(PostgreSQL)]
-    API --> VDB[(Vector DB\nWeaviate/Qdrant/pgvector/...)]
-    API --> Celery["Celery Workers\n(async tasks)"]
-    API --> PluginDaemon["Plugin Daemon\n(:5002)"]
-    API --> Sandbox["Code Sandbox\n(:8194)"]
-    API --> SSRF["SSRF Proxy\n(Squid :3128)"]
-
-    Celery --> Redis
-    Celery --> PG
-    Celery --> VDB
-
-    PluginDaemon --> API
-    Sandbox --> SSRF
-
-    subgraph Core["api/core/"]
-        direction TB
-        WF["Workflow Engine\n(graphon + nodes)"]
-        RAG["RAG Pipeline\n(extract → split → embed → retrieve)"]
-        Plugin["Plugin System\n(daemon-based)"]
-        ModelMgr["Model Manager\n(multi-provider)"]
-        AppLayer["App Layer\n(chat/workflow/agent)"]
-    end
-
-    API --> Core
-
-    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
-    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
-    classDef accent fill:#059669,stroke:#047857,color:#fff
-    classDef warn fill:#d97706,stroke:#b45309,color:#fff
-    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
-
-    class User primary
-    class API secondary
-    class WF secondary
-    class RAG accent
-    class PluginDaemon accent
-    class Sandbox warn
-    class SSRF warn
-```
-
-</details>
 
 The first thing that hits you is the service count. Dify's `docker-compose.yaml` is 1,600 lines. The core deployment is 7 containers: API server, Celery worker, Celery beat, Next.js frontend, Redis, PostgreSQL, and Nginx. Then you add a code sandbox (Go-based, isolated execution environment), a plugin daemon (separate process for running third-party plugins), and an SSRF proxy (Squid, to prevent server-side request forgery from user-submitted HTTP nodes). On top of that, you pick a vector database — and the list of supported options is staggering: Weaviate, Qdrant, pgvector, Milvus, Chroma, Elasticsearch, OpenSearch, OceanBase, TiDB, Oracle, and about 15 more.
 
@@ -168,44 +117,6 @@ node_init_kwargs_factories: Mapping[NodeType, Callable[[], dict[str, object]]] =
 
 The workflow engine is built on top of ReactFlow (frontend) and `graphon` (backend). Users drag nodes onto a canvas in the browser, connect them with edges, and the frontend sends a JSON graph structure to the API.
 
-```mermaid
-flowchart LR
-    subgraph Frontend["Browser (ReactFlow)"]
-        Canvas["Workflow Canvas"] --> JSON["Graph JSON\n{nodes: [...], edges: [...]}"]
-    end
-
-    JSON -->|POST /workflows| API["Flask API"]
-
-    subgraph Backend["Python Backend"]
-        API --> WE["WorkflowEntry"]
-        WE --> GE["GraphEngine\n(from graphon)"]
-        GE --> NF["DifyNodeFactory"]
-
-        NF -->|type=llm| LLM["LLM Node"]
-        NF -->|type=code| CODE["Code Node"]
-        NF -->|type=knowledge_retrieval| KR["Knowledge\nRetrieval Node"]
-        NF -->|type=tool| TOOL["Tool Node"]
-        NF -->|type=if_else| IF["Conditional Node"]
-        NF -->|type=iteration| ITER["Iteration Node\n(spawns child engine)"]
-        NF -->|type=agent| AGENT["Agent Node"]
-        NF -->|type=human_input| HI["Human Input\n(pause + wait)"]
-
-        GE -->|events| SSE["SSE Stream\nto client"]
-    end
-
-    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
-    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
-    classDef accent fill:#059669,stroke:#047857,color:#fff
-    classDef warn fill:#d97706,stroke:#b45309,color:#fff
-    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
-
-    class Canvas primary
-    class GE secondary
-    class NF secondary
-    class LLM accent
-    class AGENT accent
-    class HI warn
-```
 
 The supported node types tell you a lot about what Dify considers a "workflow":
 
@@ -233,52 +144,6 @@ The iteration node is interesting: it doesn't just loop — it builds a child `G
 
 Dify's RAG implementation is the most comprehensive I've seen in an open-source project. The pipeline covers the full lifecycle from document ingestion to retrieval.
 
-```mermaid
-flowchart LR
-    subgraph Ingest["Document Ingestion"]
-        Upload["Upload Document\n(PDF/Word/Excel/\nCSV/HTML/Markdown/TXT)"] --> Extract["Extractor\n(pdf_extractor.py\nword_extractor.py\n...)"]
-        Extract --> Split["Text Splitter\n(fixed_text, by separator)"]
-        Split --> Embed["Embedding\n(via model provider)"]
-        Embed --> Store["Vector Store\n(30+ backends)"]
-        Split --> Keyword["Keyword Index\n(Jieba for CJK)"]
-    end
-
-    subgraph Retrieve["Query Time"]
-        Query["User Query"] --> Router{"Retrieval Strategy"}
-        Router -->|single dataset| React["ReAct/FunctionCall\nRouter"]
-        Router -->|multi dataset| Multi["Parallel Retrieval\n(threaded)"]
-
-        React --> Method{"Search Method"}
-        Multi --> Method
-
-        Method -->|semantic| Semantic["Vector Similarity"]
-        Method -->|full_text| FTS["Full Text Search"]
-        Method -->|hybrid| Hybrid["Both + Merge"]
-        Method -->|keyword| KExt["Keyword (Jieba)"]
-
-        Semantic --> PostProc["Post-Processor\n(reranking + scoring)"]
-        FTS --> PostProc
-        Hybrid --> PostProc
-        KExt --> PostProc
-
-        PostProc -->|metadata filter| MetaFilter["LLM-based Metadata\nFiltering (optional)"]
-        MetaFilter --> Results["Ranked Documents"]
-    end
-
-    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
-    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
-    classDef accent fill:#059669,stroke:#047857,color:#fff
-    classDef warn fill:#d97706,stroke:#b45309,color:#fff
-    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
-
-    class Upload primary
-    class Query primary
-    class Embed secondary
-    class Store secondary
-    class PostProc accent
-    class MetaFilter accent
-    class Results accent
-```
 
 The `DatasetRetrieval` class in `dataset_retrieval.py` is about 1,800 lines, and it handles both single-dataset retrieval (where an LLM router decides which dataset to query) and multi-dataset retrieval (parallel queries across multiple datasets with result merging).
 
