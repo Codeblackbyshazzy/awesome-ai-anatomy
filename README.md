@@ -14,7 +14,7 @@
   <img src="https://img.shields.io/badge/license-MIT-orange" alt="License">
 </p>
 
-# 🔬 Awesome AI Anatomy
+# Awesome AI Anatomy
 
 **11 AI agent projects dissected. Some had hidden pet systems. Some had zero security. All had God Objects.**
 
@@ -24,20 +24,20 @@ Most "awesome" lists link to repos. We crack them open — architecture diagrams
 
 ---
 
-## 📋 Table of Contents
+## Table of Contents
 
-- [Greatest Hits](#-greatest-hits)
-- [Project Index](#-project-index)
-- [Cross-Project Comparison](#-cross-project-comparison)
-- [What Makes This Different](#-what-makes-this-different)
-- [Each Teardown Includes](#-each-teardown-includes)
-- [Coming Next](#️-coming-next)
-- [Contributing](#-contributing)
-- [Stay Updated](#-stay-updated)
+- [Greatest Hits](#greatest-hits)
+- [Project Index](#project-index)
+- [Cross-Project Comparison](#cross-project-comparison)
+- [What Makes This Different](#what-makes-this-different)
+- [Each Teardown Includes](#each-teardown-includes)
+- [Coming Next](#coming-next)
+- [Contributing](#contributing)
+- [Stay Updated](#stay-updated)
 
 ---
 
-## 🔥 Greatest Hits
+## Greatest Hits
 
 The 5 findings people can't stop sharing:
 
@@ -53,29 +53,29 @@ The 5 findings people can't stop sharing:
 
 ---
 
-## 📊 Project Index
+## Project Index
 
-> 11 AI agent source code analyses — from orchestration frameworks to coding assistants.
+11 AI agent source code analyses — from orchestration frameworks to coding assistants.
 
 | # | Project | Stars | Language | Lines | Key Findings | Status |
 |---|---------|-------|----------|-------|-------------|--------|
-| 001 | [**Dify**](dify/) | 136K ⭐ | Python + TS | 1.24M | `graphon` engine, 7+ containers, 30+ vector DBs | ✅ Published |
-| 002 | [**Claude Code**](claude-code/) | 109K ⭐ | TypeScript | 510K | 4-layer context, hidden pet system (18 species) | ✅ Published |
-| 003 | [**DeerFlow**](deer-flow/) | 58K ⭐ | Python + TS | — | 14-layer middleware, hash loop kill@5, no RBAC | ✅ Published |
-| 004 | [**MiroFish**](mirofish/) | 50K ⭐ | Python + Vue | 39K | LLM social sim as "collective intelligence" | ✅ Published |
-| 005 | [**Goose**](goose/) | 37K ⭐ | Rust + TS | 198K | MCP-first bus, 5-inspector pipeline, 30+ LLMs | ✅ Published |
-| 006 | [**Pi Mono**](pi-mono/) | 32K ⭐ | TypeScript | 147K | Game-engine arch, stealth mode as Claude Code | ✅ Published |
-| 007 | [**Lightpanda**](lightpanda-browser/) | 27K ⭐ | Zig + Rust | 91K | From-scratch browser for AI agents, 9× Chrome | ✅ Published |
-| 008 | [**Hermes Agent**](hermes-agent/) | 26K ⭐ | Python | 260K | Self-improving skills, FTS5 search, frozen mem | ✅ Published |
-| 009 | [**oh-my-claudecode**](oh-my-claudecode/) | 24K ⭐ | TypeScript | 194K | 19-agent team via file IPC, Haiku→Opus routing | ✅ Published |
-| 010 | [**Guardrails AI**](guardrails-ai/) | 6.6K ⭐ | Python | 18K | Validator Hub, reask self-correction loop | ✅ Published |
-| 011 | [**OpenAI Codex CLI**](codex-cli/) | 27K+ ⭐ | Rust | 549K | Queue-pair arch, Guardian AI approval, 3-OS sandbox | ✅ **NEW** |
+| 001 | [**Dify**](dify/) | 136K | Python + TS | 1.24M | `graphon` engine, 7+ containers, 30+ vector DBs | Published |
+| 002 | [**Claude Code**](claude-code/) | 109K | TypeScript | 510K | 4-layer context, hidden pet system (18 species) | Published |
+| 003 | [**DeerFlow**](deer-flow/) | 58K | Python + TS | — | 14-layer middleware, hash loop kill@5, no RBAC | Published |
+| 004 | [**MiroFish**](mirofish/) | 50K | Python + Vue | 39K | LLM social sim as "collective intelligence" | Published |
+| 005 | [**Goose**](goose/) | 37K | Rust + TS | 198K | MCP-first bus, 5-inspector pipeline, 30+ LLMs | Published |
+| 006 | [**Pi Mono**](pi-mono/) | 32K | TypeScript | 147K | Game-engine arch, stealth mode as Claude Code | Published |
+| 007 | [**Lightpanda**](lightpanda-browser/) | 27K | Zig + Rust | 91K | From-scratch browser for AI agents, 9x Chrome | Published |
+| 008 | [**Hermes Agent**](hermes-agent/) | 26K | Python | 260K | Self-improving skills, FTS5 search, frozen mem | Published |
+| 009 | [**oh-my-claudecode**](oh-my-claudecode/) | 24K | TypeScript | 194K | 19-agent team via file IPC, Haiku→Opus routing | Published |
+| 010 | [**Guardrails AI**](guardrails-ai/) | 6.6K | Python | 18K | Validator Hub, reask self-correction loop | Published |
+| 011 | [**OpenAI Codex CLI**](codex-cli/) | 27K+ | Rust | 549K | Queue-pair arch, Guardian AI approval, 3-OS sandbox | **NEW** |
 
-> Projects sorted by GitHub stars (descending).
+Projects sorted by GitHub stars (descending).
 
 ---
 
-## 🆚 Cross-Project Comparison
+## Cross-Project Comparison
 
 We maintain a detailed **[COMPARISON.md](COMPARISON.md)** with side-by-side analysis across all 11 projects:
 
@@ -84,7 +84,7 @@ We maintain a detailed **[COMPARISON.md](COMPARISON.md)** with side-by-side anal
 - Multi-agent & orchestration approaches
 - Memory & persistence strategies
 
-We also have a new **[CROSS-CUTTING.md](CROSS-CUTTING.md)** — a deep horizontal analysis covering:
+We also have a **[CROSS-CUTTING.md](CROSS-CUTTING.md)** — a deep horizontal analysis covering:
 
 - Architecture pattern taxonomy across all projects
 - Context management strategies compared
@@ -93,14 +93,13 @@ We also have a new **[CROSS-CUTTING.md](CROSS-CUTTING.md)** — a deep horizonta
 - Anti-pattern catalog with evidence
 - "Build from scratch" recommendations
 - Safety & security postures
-- Design patterns and anti-patterns found
 - "If I Were Building an Agent Today" synthesis
 
-➡️ **[Read the full comparison →](COMPARISON.md)**
+**[Read the full comparison →](COMPARISON.md)**
 
 ---
 
-## 🎯 What Makes This Different
+## What Makes This Different
 
 | Other "awesome" lists | This repo |
 |----------------------|-----------|
@@ -112,15 +111,11 @@ We also have a new **[CROSS-CUTTING.md](CROSS-CUTTING.md)** — a deep horizonta
 
 ---
 
-## 📐 Each Teardown Includes
+## Each Teardown Includes
 
-```
-📄 README.md          — Full source code analysis + architecture decisions
-⚠️ Problems found     — Bugs, code smells, architectural risks
-🆚 Comparisons        — How it stacks up against alternatives
-```
-
----
+- `README.md` — Full source code analysis + architecture decisions
+- Problems found — Bugs, code smells, architectural risks
+- Comparisons — How it stacks up against alternatives
 
 ---
 
@@ -132,33 +127,33 @@ We also have a new **[CROSS-CUTTING.md](CROSS-CUTTING.md)** — a deep horizonta
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
-Found an error? Have a better analysis? PRs welcome!
+Found an error? Have a better analysis? PRs welcome.
 
-- 🐛 Fix factual errors
-- 🔍 Add missing architecture details
-- 💡 Suggest projects to teardown → [Open an Issue](https://github.com/NeuZhou/awesome-ai-anatomy/issues)
-- 🌍 Help translate teardowns
+- Fix factual errors
+- Add missing architecture details
+- Suggest projects to teardown → [Open an Issue](https://github.com/NeuZhou/awesome-ai-anatomy/issues)
+- Help translate teardowns
 
 ---
 
-## 📌 Stay Updated
+## Stay Updated
 
-New teardown every week. We're working through the top AI agent projects — Cursor, Windsurf, and others are on the list.
+New teardown every week. Cursor, Windsurf, and others are on the list.
 
-**⭐ Star this repo** → GitHub will notify you when new teardowns drop. That's literally what the star button does — it's a subscribe button, not a vanity metric.
+**Star this repo** — GitHub will notify you when new teardowns drop.
 
-**👁️ Watch** → Get notified for every new teardown, not just the ones that trend.
+**Watch** — Get notified for every new teardown, not just the ones that trend.
 
-We've published 11 deep-dives so far. The next batch is already in progress.
+11 deep-dives published so far. The next batch is already in progress.
 
-- 💬 Discord: [Join the community](https://discord.gg/kAQD7Cj8) — discuss architecture decisions
+- Discord: [Join the community](https://discord.gg/kAQD7Cj8) — discuss architecture decisions
 
 ---
 
 <details>
-<summary>⚠️ Disclaimer</summary>
+<summary>Disclaimer</summary>
 
 These teardowns are independent technical commentary for educational purposes. All code snippets are cited under fair use for criticism, commentary, and education. Project names and trademarks belong to their respective owners. Star counts and LOC figures are snapshots at time of writing and may have changed.
 
