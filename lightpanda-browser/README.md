@@ -35,59 +35,6 @@ The pitch: 9x faster than Chrome, 16x less memory, instant startup. The reality:
 
 ![Architecture](architecture.png)
 
-<details>
-<summary>Mermaid source (click to expand)</summary>
-
-```mermaid
-graph LR
-    subgraph Entry["Binary Entry Points"]
-        Main["main.zig"] --> |"serve"| Server["Server.zig\n(CDP WebSocket)"]
-        Main --> |"fetch"| Fetch["fetch mode\n(single URL dump)"]
-        Main --> |"mcp"| MCP["MCP Server\n(stdio JSON-RPC)"]
-    end
-
-    subgraph Core["Browser Core"]
-        Server --> CDP["CDP.zig\n(protocol dispatcher)"]
-        CDP --> Browser["Browser.zig"]
-        Browser --> Session["Session.zig\n(1 per tab)"]
-        Session --> Page["Page.zig\n(3,660 lines, the beast)"]
-    end
-
-    subgraph Engines["Foreign Engines (FFI)"]
-        Page --> V8["V8 via zig-v8-fork\n(JavaScript execution)"]
-        Page --> H5E["html5ever (Rust)\n(HTML parsing via C FFI)"]
-    end
-
-    subgraph Net["Network Layer"]
-        Page --> HttpClient["HttpClient.zig"]
-        HttpClient --> Network["Network.zig\n(libcurl multi + poll loop)"]
-        Network --> Curl["libcurl + BoringSSL\n(HTTP/2, brotli, zlib)"]
-    end
-
-    subgraph WebAPI["Web APIs (Zig)"]
-        Page --> Window["Window.zig"]
-        Page --> Document["Document.zig"]
-        Page --> DOM["60+ DOM/Web API files"]
-    end
-
-    CDP --> |"notifications"| Notification["Notification.zig\n(event bus)"]
-    Notification --> Page
-
-    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
-    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
-    classDef accent fill:#059669,stroke:#047857,color:#fff
-    classDef warn fill:#d97706,stroke:#b45309,color:#fff
-    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
-
-    class Main primary
-    class Page secondary
-    class CDP secondary
-    class V8 accent
-    class H5E accent
-    class Network accent
-```
-
-</details>
 
 The architecture is a straightforward pipeline: network data comes in through libcurl, gets parsed by html5ever into a DOM tree managed entirely in Zig, V8 runs JavaScript against that DOM through a binding layer, and CDP exposes all of this to external tools like Playwright and Puppeteer.
 
@@ -175,26 +122,6 @@ fn dispatchCommand(command: *Command, method: []const u8) !void {
 
 This is a two-level dispatch. First, it branches on the domain name *length*. Then within each length bucket, it casts the domain string bytes directly into an integer and does an integer switch. `"DOM"` becomes the 24-bit integer `0x444F4D`, `"Page"` becomes the 32-bit integer `0x50616765`. The Zig compiler can turn these into jump tables or simple comparisons — no hashing, no string comparison loops.
 
-```mermaid
-flowchart LR
-    MSG["CDP Message\n'Page.navigate'"] --> SPLIT["Split at '.'"]
-    SPLIT --> LEN["domain.len = 4"]
-    LEN --> CAST["@bitCast 'Page' → u32"]
-    CAST --> SWITCH["switch(u32)"]
-    SWITCH --> |"match"| PAGE["domains/page.zig"]
-    SWITCH --> |"no match"| ERR["UnknownDomain"]
-
-    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
-    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
-    classDef accent fill:#059669,stroke:#047857,color:#fff
-    classDef warn fill:#d97706,stroke:#b45309,color:#fff
-    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
-
-    class MSG primary
-    class SWITCH secondary
-    class PAGE accent
-    class ERR warn
-```
 
 Is this worth the cleverness? For a hot path that processes every CDP message, and given that there are only 15 domains right now, probably yes. The domain names are all ASCII and bounded in length (max 13 chars for "Accessibility"), so the integer casts are safe. It's a micro-optimization that happens to also be readable once you understand the pattern.
 
@@ -227,22 +154,6 @@ This callback-based design means the DOM tree is always owned by Zig. html5ever 
 
 They also recently added streaming support (`html5ever_streaming_parser_create/feed/finish`), which lets pages be parsed incrementally as network data arrives. This is important for large pages and for `document.write` support, which needs to inject content mid-parse.
 
-```mermaid
-sequenceDiagram
-    participant Zig as Page.zig (Zig)
-    participant Rust as html5ever (Rust FFI)
-    participant V8 as V8 Engine
-
-    Zig->>Rust: html5ever_parse_document(html, callbacks...)
-    loop For each DOM node found
-        Rust->>Zig: create_element_callback(tag, attrs)
-        Zig->>Zig: Allocate Node in Zig arena
-        Rust->>Zig: append_callback(parent, child)
-    end
-    Rust->>Zig: Return (parsing done)
-    Zig->>V8: Execute script tags found during parse
-    V8->>Zig: DOM manipulation calls (via bridge.zig)
-```
 
 ### 3. The V8 Integration Model
 
