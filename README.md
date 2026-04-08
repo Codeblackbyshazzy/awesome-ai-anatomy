@@ -126,7 +126,7 @@ We also have a new **[CROSS-CUTTING.md](CROSS-CUTTING.md)** — a deep horizonta
 
 ## Coming Next
 
-- [ ] OpenCode (139K stars) — the open-source coding agent everyone uses
+- [ ] Crush (22K stars) — OpenCode's successor, built by the Charm team (Bubble Tea)
 - [ ] Cursor — the most controversial AI IDE
 - [ ] Windsurf — Codeium's AI IDE challenger
 
