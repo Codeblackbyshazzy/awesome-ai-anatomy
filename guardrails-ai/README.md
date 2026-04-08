@@ -73,12 +73,12 @@ Under the hood, it fetches a manifest from the Guardrails Hub service, `pip inst
 # From guardrails/hub/validator_package_service.py:68
 @staticmethod
 def detect_installer() -> str:
-    env_installer = os.environ.get(_GUARDRAILS_INSTALLER_ENV, "").strip().lower()
-    if env_installer in ("uv", "pip"):
-        return env_installer
-    if shutil.which("uv") is not None:
-        return "uv"
-    return "pip"
+ env_installer = os.environ.get(_GUARDRAILS_INSTALLER_ENV, "").strip().lower()
+ if env_installer in ("uv", "pip"):
+ return env_installer
+ if shutil.which("uv") is not None:
+ return "uv"
+ return "pip"
 ```
 
 Each validator is a separate Python package with its own version, dependencies, and optional ML model. The registry is just a JSON file mapping validator names to import paths:
@@ -86,10 +86,10 @@ Each validator is a separate Python package with its own version, dependencies, 
 ```python
 # From guardrails/types/validator_registry.py:6
 class ValidatorRegistryEntry(BaseModel):
-    import_path: Optional[str] = Field(default=None)
-    exports: list[str] = Field(default_factory=list)
-    installed_at: Optional[str] = Field(default=None)
-    package_name: Optional[str] = Field(default=None)
+ import_path: Optional[str] = Field(default=None)
+ exports: list[str] = Field(default_factory=list)
+ installed_at: Optional[str] = Field(default=None)
+ package_name: Optional[str] = Field(default=None)
 ```
 
 This is the most commercially significant part of the project. The Hub creates an ecosystem moat — once you have 50+ community validators, switching costs get real.
@@ -101,24 +101,24 @@ When validation fails, Guardrails can automatically re-prompt the LLM with the e
 ```python
 # From guardrails/run/runner.py:100
 for index in range(self.num_reasks + 1):
-    iteration = self.step(
-        index=index,
-        api=self.api,
-        messages=messages,
-        prompt_params=prompt_params,
-        output_schema=output_schema,
-        output=self.output if index == 0 else None,
-        call_log=call_log,
-    )
-    if not self.do_loop(index, iteration.reasks):
-        break
-    (output_schema, messages) = self.prepare_to_loop(
-        iteration.reasks,
-        output_schema,
-        parsed_output=iteration.outputs.parsed_output,
-        validated_output=call_log.validation_response,
-        prompt_params=prompt_params,
-    )
+ iteration = self.step(
+ index=index,
+ api=self.api,
+ messages=messages,
+ prompt_params=prompt_params,
+ output_schema=output_schema,
+ output=self.output if index == 0 else None,
+ call_log=call_log,
+ )
+ if not self.do_loop(index, iteration.reasks):
+ break
+ (output_schema, messages) = self.prepare_to_loop(
+ iteration.reasks,
+ output_schema,
+ parsed_output=iteration.outputs.parsed_output,
+ validated_output=call_log.validation_response,
+ prompt_params=prompt_params,
+ )
 ```
 
 The reask mechanism supports three scenarios: non-parseable output (LLM returned garbage), skeleton errors (JSON structure doesn't match schema), and field-level errors (individual values failed validation). Each gets a different prompt template.
@@ -149,7 +149,7 @@ RAIL (Reliable AI Language) is an XML-based specification for defining output sc
 <!-- From test_spec.rail -->
 <rail version="0.1">
 <output>
-    <string name="answer" description="A simple answer"/>
+ <string name="answer" description="A simple answer"/>
 </output>
 <prompt>
 Answer the question: What is 2+2?
@@ -162,17 +162,17 @@ The RAIL parser in `guardrails/schema/rail_schema.py` (550+ lines) converts XML 
 ```python
 # From guardrails/schema/rail_schema.py:66
 def extract_validators(
-    element: _Element, processed_schema: ProcessedSchema, json_path: str
+ element: _Element, processed_schema: ProcessedSchema, json_path: str
 ):
-    validators = get_validators(element)
-    for validator in validators:
-        validator_reference = ValidatorReference(
-            id=validator.rail_alias,
-            on=json_path,
-            on_fail=validator.on_fail_descriptor,
-            kwargs=validator.get_args(),
-        )
-        processed_schema.validators.append(validator_reference)
+ validators = get_validators(element)
+ for validator in validators:
+ validator_reference = ValidatorReference(
+ id=validator.rail_alias,
+ on=json_path,
+ on_fail=validator.on_fail_descriptor,
+ kwargs=validator.get_args(),
+ )
+ processed_schema.validators.append(validator_reference)
 ```
 
 The RAIL spec was a bold design choice — creating a DSL for LLM output validation. In practice, it lost out to the Pydantic model approach (`Guard.for_pydantic()`), which is more Pythonic and doesn't require learning a new XML dialect. The codebase still carries all the RAIL parsing infrastructure though, which adds weight.
@@ -184,12 +184,12 @@ Guardrails has a client-server mode that most people don't know about. Setting `
 ```python
 # From guardrails/guard.py:377
 def _single_server_call(self, *, payload: Dict[str, Any]) -> ValidationOutcome[OT]:
-    if self._use_server and self._api_client:
-        validation_output: IValidationOutcome = self._api_client.validate(
-            guard=self,
-            openai_api_key=get_call_kwarg("api_key"),
-            **payload,
-        )
+ if self._use_server and self._api_client:
+ validation_output: IValidationOutcome = self._api_client.validate(
+ guard=self,
+ openai_api_key=get_call_kwarg("api_key"),
+ **payload,
+ )
 ```
 
 This is the commercial angle. The open-source library validates locally; the paid service validates remotely with managed infrastructure, hosted ML models, and a dashboard. The code paths diverge at `_execute` — if `use_server` is True and the model is supported, it calls `_call_server` instead of running the local `Runner`.
@@ -239,14 +239,14 @@ The eight variants of `OnFailAction` — `reask`, `fix`, `filter`, `refrain`, `n
 ```python
 # From guardrails/types/on_fail.py:7
 class OnFailAction(str, Enum):
-    REASK = "reask"
-    FIX = "fix"
-    FILTER = "filter"
-    REFRAIN = "refrain"
-    NOOP = "noop"
-    EXCEPTION = "exception"
-    FIX_REASK = "fix_reask"
-    CUSTOM = "custom"
+ REASK = "reask"
+ FIX = "fix"
+ FILTER = "filter"
+ REFRAIN = "refrain"
+ NOOP = "noop"
+ EXCEPTION = "exception"
+ FIX_REASK = "fix_reask"
+ CUSTOM = "custom"
 ```
 
 ### 2. Streaming Chunk Accumulation
@@ -256,15 +256,15 @@ The `validate_stream` method on `Validator` accumulates LLM chunks until a sente
 ```python
 # From guardrails/validator_base.py:166
 def validate_stream(self, chunk: Any, metadata: Dict[str, Any], ...) -> Optional[ValidationResult]:
-    accumulated_chunks = self.accumulated_chunks
-    accumulated_chunks.append(chunk)
-    accumulated_text = "".join(accumulated_chunks)
-    split_contents = self._chunking_function(accumulated_text)
-    if len(split_contents) == 0:
-        return None  # Not enough accumulated yet
-    [chunk_to_validate, new_accumulated_chunks] = split_contents
-    self.accumulated_chunks = [new_accumulated_chunks]
-    return self.validate(chunk_to_validate, metadata)
+ accumulated_chunks = self.accumulated_chunks
+ accumulated_chunks.append(chunk)
+ accumulated_text = "".join(accumulated_chunks)
+ split_contents = self._chunking_function(accumulated_text)
+ if len(split_contents) == 0:
+ return None # Not enough accumulated yet
+ [chunk_to_validate, new_accumulated_chunks] = split_contents
+ self.accumulated_chunks = [new_accumulated_chunks]
+ return self.validate(chunk_to_validate, metadata)
 ```
 
 ### 3. Validator-as-pip-package Registry
