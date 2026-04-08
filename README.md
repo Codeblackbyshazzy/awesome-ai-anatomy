@@ -9,14 +9,14 @@
 <p align="center">
   <img src="https://img.shields.io/github/stars/NeuZhou/awesome-ai-anatomy?style=social" alt="Stars">
   <img src="https://img.shields.io/github/forks/NeuZhou/awesome-ai-anatomy?style=social" alt="Forks">
-  <img src="https://img.shields.io/badge/teardowns-11-blue" alt="Teardowns">
+  <img src="https://img.shields.io/badge/teardowns-12-blue" alt="Teardowns">
   <img src="https://img.shields.io/badge/updated-weekly-brightgreen" alt="Updated Weekly">
   <img src="https://img.shields.io/badge/license-MIT-orange" alt="License">
 </p>
 
 # Awesome AI Anatomy
 
-**11 AI agent projects dissected. Some had hidden pet systems. Some had zero security. All had God Objects.**
+**12 AI agent projects dissected. Some had hidden pet systems. Some had zero security. All had God Objects.**
 
 Claude Code ships 18 virtual pet species in production. Pi Mono can impersonate Claude Code to dodge rate limits. MiroFish's "collective intelligence" is just LLMs role-playing on a fake social network. These aren't hot takes — they're findings from reading every line of code.
 
@@ -55,7 +55,7 @@ The 5 findings people can't stop sharing:
 
 ## Project Index
 
-11 AI agent source code analyses — from orchestration frameworks to coding assistants.
+12 AI agent source code analyses — from orchestration frameworks to coding assistants.
 
 | # | Project | Stars | Language | Lines | Key Findings | Status |
 |---|---------|-------|----------|-------|-------------|--------|
@@ -69,7 +69,8 @@ The 5 findings people can't stop sharing:
 | 008 | [**Hermes Agent**](hermes-agent/) | 26K | Python | 260K | Self-improving skills, FTS5 search, frozen mem | Published |
 | 009 | [**oh-my-claudecode**](oh-my-claudecode/) | 24K | TypeScript | 194K | 19-agent team via file IPC, Haiku→Opus routing | Published |
 | 010 | [**Guardrails AI**](guardrails-ai/) | 6.6K | Python | 18K | Validator Hub, reask self-correction loop | Published |
-| 011 | [**OpenAI Codex CLI**](codex-cli/) | 27K+ | Rust | 549K | Queue-pair arch, Guardian AI approval, 3-OS sandbox | **NEW** |
+| 011 | [**OpenAI Codex CLI**](codex-cli/) | 27K+ | Rust | 549K | Queue-pair arch, Guardian AI approval, 3-OS sandbox | Published |
+| 012 | [**Cline**](cline/) | 60K | TypeScript | 560K | 3,756-line God Object, 40+ providers, YOLO mode, hooks system | **NEW** |
 
 Projects sorted by GitHub stars (descending).
 
@@ -121,9 +122,9 @@ We also have a **[CROSS-CUTTING.md](CROSS-CUTTING.md)** — a deep horizontal an
 
 ## Coming Next
 
+- [ ] browser-use (86K stars) — AI browser automation, Python
 - [ ] Crush (22K stars) — OpenCode's successor, built by the Charm team (Bubble Tea)
-- [ ] Cursor — the most controversial AI IDE
-- [ ] Windsurf — Codeium's AI IDE challenger
+- [ ] Cursor — the most controversial AI IDE (closed source, partial analysis)
 
 ---
 
@@ -146,7 +147,7 @@ New teardown every week. Cursor, Windsurf, and others are on the list.
 
 **Watch** — Get notified for every new teardown, not just the ones that trend.
 
-11 deep-dives published so far. The next batch is already in progress.
+12 deep-dives published so far. The next batch is already in progress.
 
 - Discord: [Join the community](https://discord.gg/kAQD7Cj8) — discuss architecture decisions
 
@@ -164,5 +165,5 @@ If you're a project maintainer and have concerns about any content, please [open
 ---
 
 <p align="center">
-  <i>11 projects dissected. Updated weekly.<br>If you build AI agents, you should know how the best ones actually work.</i>
+  <i>12 projects dissected. Updated weekly.<br>If you build AI agents, you should know how the best ones actually work.</i>
 </p>

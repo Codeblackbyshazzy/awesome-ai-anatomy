@@ -1,0 +1,44 @@
+name: Cline
+url: https://github.com/cline/cline
+stars: 60000
+language: TypeScript
+lines: 560000
+framework: "VS Code Extension API, React (webview), Puppeteer (browser)"
+license: Apache-2.0
+version: "3.77.0"
+original_name: claude-dev
+type: "VS Code Extension (AI Coding Agent)"
+
+key_findings:
+  - "3,756-line God Object (Task class) — largest agent loop file in our survey"
+  - "30+ parameter ToolExecutor constructor with 15 callback functions"
+  - "40+ LLM provider adapters — most in any open-source coding agent"
+  - "Polling-based human approval (pWaitFor at 100ms intervals on shared mutable state)"
+  - "YOLO mode auto-approves everything including shell commands with one toggle"
+  - "8 lifecycle hooks (shell scripts as extension points) with context injection"
+  - "Prompt variant system with model-family-specific templates (next-gen, devstral, gemini-3, etc.)"
+  - "Focus Chain — built-in markdown task tracker the model maintains during execution"
+  - "Recursive agent loop (recursivelyMakeClineRequests calls itself) instead of iterative while(true)"
+  - "In-process sub-agents (no process isolation, depth limited to 1)"
+  - "Full MCP client (tools, resources, prompts, OAuth, SSE, Streamable HTTP)"
+  - "Browser automation via Puppeteer-core with screenshot-based vision navigation"
+  - "Context management via message truncation (quarter strategy) not structured summarization"
+  - "Loop detection at tool level — soft warning at 3 repetitions, hard escalation at 5"
+  - "File read deduplication cache to prevent repeated token-wasting reads"
+  - "npm package still named 'claude-dev' — identity crisis in the codebase"
+
+rating: B-
+rating_justification: >
+  Massive feature set with genuine innovation in provider support (40+), 
+  extensibility (hooks, skills, MCP, rules), and IDE integration depth. 
+  But the core agent loop is an unmaintainable 3,756-line God Object with 
+  callback spaghetti, shared mutable state, recursive execution, and no 
+  tool sandboxing. The architecture grew organically from a weekend project 
+  and shows it at every critical junction. Needs a fundamental refactor 
+  of the innermost layer to sustain growth.
+
+comparison_notes:
+  vs_claude_code: "More features (hooks, browser, 40+ providers) but worse architecture (3,756 vs 1,729 line core, callbacks vs pure functions)"
+  vs_goose: "More tools built-in but less secure (in-process vs MCP process isolation)"
+  vs_pi_mono: "Better IDE integration and provider support, similar architectural quality"
+  vs_codex_cli: "Far more features but zero sandboxing vs Codex's seatbelt/landlock model"
