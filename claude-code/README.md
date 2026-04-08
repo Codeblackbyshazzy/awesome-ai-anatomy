@@ -64,61 +64,6 @@
 
 ![Architecture](architecture.png)
 
-<details>
-<summary>Mermaid source (click to expand)</summary>
-
-```mermaid
-graph LR
-    subgraph Entry["🚀 CLI Entry"]
-        CLI["claude CLI\n(Bun runtime)"] -->|"lazy import()"| App["Main App\n(React/Ink TUI)"]
-    end
-
-    subgraph Session["📋 Session Layer"]
-        App --> SM["Session Manager"]
-        SM --> Auth["Auth\n(OAuth/API Key/Bedrock/Vertex)"]
-        SM --> Config["Config + Feature Flags"]
-        SM --> Mem["Memory (.claude/)"]
-    end
-
-    subgraph Core["⚡ Agentic Core (query.ts - 1,729 lines)"]
-        SM --> Loop["while(true)"]
-        Loop --> Pre["Preprocess\n(4-layer context mgmt)"]
-        Pre --> API["Claude API\n(streaming SSE)"]
-        API --> Parse["Parse Response\n(detect tool_use)"]
-        Parse --> Exec["StreamingToolExecutor\n(parallel execution)"]
-        Exec -->|"results → messages"| Loop
-    end
-
-    subgraph Tools["🔧 Tool System (40+)"]
-        Exec --> Bash["BashTool\n(sandbox, timeout)"]
-        Exec --> File["FileRead/Write"]
-        Exec --> Search["Search/Grep"]
-        Exec --> MCP["MCP Bridges"]
-        Exec --> Agent["Agent Spawn"]
-    end
-
-    subgraph Context["🧠 Context Management"]
-        Pre --> L1["L1: HISTORY_SNIP\nSurgical deletion"]
-        L1 --> L2["L2: Microcompact\nCache-level editing"]
-        L2 --> L3["L3: CONTEXT_COLLAPSE\nStructured archival"]
-        L3 --> L4["L4: Autocompact\nFull compression"]
-    end
-
-    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
-    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
-    classDef accent fill:#059669,stroke:#047857,color:#fff
-    classDef warn fill:#d97706,stroke:#b45309,color:#fff
-    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
-
-    class CLI primary
-    class Loop secondary
-    class Pre secondary
-    class Exec accent
-    class Bash accent
-    class MCP accent
-```
-
-</details>
 
 ---
 
@@ -165,25 +110,6 @@ If I were leading the next architecture review, I'd split it into three modules:
 
 This is the most sophisticated part of the codebase. Most agents use a single "summarize and truncate" approach. Claude Code uses four mechanisms, applied in cascade:
 
-```mermaid
-graph LR
-    Start["Context too long?"] --> L1["L1: HISTORY_SNIP\nSurgical deletion, lossless"]
-    L1 -->|"still too long"| L2["L2: Microcompact\nCache-level editing\nAPI tells model to ignore cached tokens"]
-    L2 -->|"still too long"| L3["L3: CONTEXT_COLLAPSE\nStructured archival\nGit-commit-log style summaries"]
-    L3 -->|"still too long"| L4["L4: Autocompact\nFull compression, last resort"]
-
-    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
-    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
-    classDef accent fill:#059669,stroke:#047857,color:#fff
-    classDef warn fill:#d97706,stroke:#b45309,color:#fff
-    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
-
-    class Start primary
-    class L1 accent
-    class L2 accent
-    class L3 warn
-    class L4 warn
-```
 
 **The design principle:** Lossless before lossy. Local before global.
 
@@ -197,26 +123,6 @@ Layer 1 only removes irrelevant messages - zero information distortion. Layer 2 
 
 ## Streaming Tool Execution - Why Claude Code Feels Fast
 
-```mermaid
-sequenceDiagram
-    participant M as Claude API (streaming)
-    participant SE as StreamingToolExecutor
-    participant R as Read Tools (parallel)
-    participant W as Write Tools (exclusive)
-
-    M->>SE: tool_use: grep
-    SE->>R: ⚡ Start immediately
-    M->>SE: tool_use: read_file
-    SE->>R: ⚡ Start in parallel
-    Note over R: Both running while\nmodel still talks
-    M->>SE: tool_use: write_file
-    R-->>SE: grep results
-    R-->>SE: file contents
-    SE->>W: 🔒 Exclusive lock
-    W-->>SE: write complete
-    M->>SE: [stream end]
-    SE-->>M: All results (ordered)
-```
 
 **Key design:** Read-only tools run in parallel. Write tools get exclusive locks. Results are buffered in receive order.
 
@@ -299,29 +205,6 @@ This team uses research methodology in production engineering. They can quantify
 
 ## Multi-Agent Coordination
 
-```mermaid
-graph LR
-    Main["Main Agent\nTools: TeamCreate, SendMessage, StopWorker"]
-    Main -->|spawns| W1["Worker 1"]
-    Main -->|spawns| W2["Worker 2"]
-    Main -->|spawns| W3["Worker 3"]
-
-    W1 -.-|"❌ Cannot spawn sub-workers"| X1["No TeamCreate"]
-    W2 -.-|"❌ No infinite nesting"| X2["No TeamCreate"]
-
-    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
-    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
-    classDef accent fill:#059669,stroke:#047857,color:#fff
-    classDef warn fill:#d97706,stroke:#b45309,color:#fff
-    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
-
-    class Main primary
-    class W1 secondary
-    class W2 secondary
-    class W3 secondary
-    class X1 warn
-    class X2 warn
-```
 
 Workers cannot create sub-workers - prevents resource explosion. Three backends: tmux panes, in-process, remote.
 
