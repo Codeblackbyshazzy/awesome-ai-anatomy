@@ -52,19 +52,19 @@ This is the thing that makes OMC architecturally unique. Instead of thread pools
 ```
 .omc/state/team/{team-name}/
 ├── dispatch/
-│   ├── requests.json    ← task queue (mutex-locked via mkdir)
-│   └── .lock/           ← directory-based lock (O_EXCL mkdir)
+│ ├── requests.json ← task queue (mutex-locked via mkdir)
+│ └── .lock/ ← directory-based lock (O_EXCL mkdir)
 ├── workers/
-│   ├── worker-0/
-│   │   ├── inbox.jsonl  ← messages TO this worker
-│   │   ├── outbox.jsonl ← messages FROM this worker
-│   │   └── heartbeat.json
-│   └── worker-1/
-│       └── ...
+│ ├── worker-0/
+│ │ ├── inbox.jsonl ← messages TO this worker
+│ │ ├── outbox.jsonl ← messages FROM this worker
+│ │ └── heartbeat.json
+│ └── worker-1/
+│ └── ...
 ├── tasks/
-│   ├── task-001.json
-│   └── task-002.json
-└── shutdown.signal      ← graceful shutdown
+│ ├── task-001.json
+│ └── task-002.json
+└── shutdown.signal ← graceful shutdown
 ```
 
 The locking mechanism is `mkdir`-based (O_EXCL flag) — creating a directory is atomic on all filesystems, so it works as a cross-process mutex without needing advisory file locks. Stale locks are detected and cleaned up after 5 minutes.
