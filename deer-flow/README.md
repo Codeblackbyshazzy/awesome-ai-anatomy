@@ -34,6 +34,23 @@ DeerFlow is an orchestration layer that lets one LLM manage sub-agents, run sand
 
 ![Architecture](architecture.png)
 
+<!-- Additional architecture diagrams -->
+
+![Diagram 1](deer-flow-1.png)
+
+
+![Diagram 2](deer-flow-2.png)
+
+
+![Diagram 3](deer-flow-3.png)
+
+
+![Diagram 4](deer-flow-4.png)
+
+
+![Diagram 5](deer-flow-5.png)
+
+
 The system runs two backend services behind Nginx:
 
 
