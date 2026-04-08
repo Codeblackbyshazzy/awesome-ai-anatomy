@@ -33,6 +33,17 @@ Pi is a monorepo of seven npm packages that together form a full stack for build
 
 ![Architecture](architecture.png)
 
+<!-- Additional architecture diagrams -->
+
+![Diagram 1](pi-mono-1.png)
+
+
+![Diagram 2](pi-mono-2.png)
+
+
+![Diagram 3](pi-mono-3.png)
+
+
 
 The stack is layered in a way that'll feel familiar if you've worked with game engines: `pi-ai` is the renderer abstraction (swap OpenGL for Anthropic), `pi-agent-core` is the game loop (stream→toolcall→execute→repeat), `pi-tui` is the scene graph (differential rendering, component hierarchy), and `pi-coding-agent` is the actual game (all the content, modes, UI).
 
