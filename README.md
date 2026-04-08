@@ -124,11 +124,11 @@ We also have a new **[CROSS-CUTTING.md](CROSS-CUTTING.md)** — a deep horizonta
 
 ---
 
-## 🗓️ Coming Next
+## Coming Next
 
+- [ ] OpenCode (139K stars) — the open-source coding agent everyone uses
 - [ ] Cursor — the most controversial AI IDE
-- [ ] everything-claude-code (141K ⭐) — optimizing the harness
-- [ ] agency-agents (72K ⭐) — the agent swarm
+- [ ] Windsurf — Codeium's AI IDE challenger
 
 ---
 
