@@ -841,3 +841,8 @@ codex-rs/
 ---
 
 *Analysis based on the public [openai/codex](https://github.com/openai/codex) repository (Apache-2.0 license). All code references are to the open-source codebase.*
+
+
+## Additional Diagrams
+
+![Diagram 1](codex-cli-1.png)
