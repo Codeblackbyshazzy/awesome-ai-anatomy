@@ -33,6 +33,14 @@ Guardrails AI wraps LLM API calls and validates the output against a schema you 
 
 ![Architecture](architecture.png)
 
+<!-- Additional architecture diagrams -->
+
+![Diagram 1](guardrails-ai-1.png)
+
+
+![Diagram 2](guardrails-ai-2.png)
+
+
 
 The whole thing flows through a single central class: `Guard`. It holds your validators, your output schema, your execution history, your API client, your telemetry config — everything. When you call it, it builds a `Runner`, which loops through LLM calls and validation steps until the output passes or the reask budget runs out.
 
