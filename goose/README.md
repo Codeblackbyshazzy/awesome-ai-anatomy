@@ -33,66 +33,6 @@ Goose is an on-machine AI agent that runs shell commands, edits files, manages e
 
 ![Architecture](architecture.png)
 
-<details>
-<summary>Mermaid source (click to expand)</summary>
-
-```mermaid
-graph LR
-    subgraph Entry["Entry Points"]
-        CLI["goose CLI\n(goose-cli crate)"]
-        Desktop["Desktop App\n(Electron + React)"]
-    end
-
-    subgraph Server["goose-server (Axum)"]
-        API["REST + WebSocket API"]
-        SessionMgr["Session Manager\n(SQLite-backed)"]
-    end
-
-    subgraph Core["goose crate — The Agent"]
-        Agent["Agent struct"]
-        PromptMgr["Prompt Manager"]
-        ExtMgr["Extension Manager"]
-        ToolInspection["Tool Inspection Pipeline\n(Security / Egress / Adversary / Permission / Repetition)"]
-        ContextMgmt["Context Management\n(auto-compact + tool-pair summarization)"]
-        ProviderRegistry["Provider Registry\n(30+ providers)"]
-    end
-
-    subgraph Extensions["Extension Layer (MCP)"]
-        Platform["Platform Extensions\n(developer, analyze, todo, apps, summon...)"]
-        Builtin["Builtin MCP Servers\n(memory, computercontroller, autovisualiser, tutorial)"]
-        External["External MCP Servers\n(stdio | streamable-http)"]
-        Frontend["Frontend Tools\n(desktop-only)"]
-    end
-
-    CLI --> API
-    Desktop --> API
-    API --> SessionMgr
-    API --> Agent
-    Agent --> PromptMgr
-    Agent --> ExtMgr
-    Agent --> ToolInspection
-    Agent --> ContextMgmt
-    Agent --> ProviderRegistry
-    ExtMgr --> Platform
-    ExtMgr --> Builtin
-    ExtMgr --> External
-    ExtMgr --> Frontend
-
-    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
-    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
-    classDef accent fill:#059669,stroke:#047857,color:#fff
-    classDef warn fill:#d97706,stroke:#b45309,color:#fff
-    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
-
-    class CLI primary
-    class Desktop primary
-    class Agent secondary
-    class ExtMgr secondary
-    class ToolInspection warn
-    class ProviderRegistry accent
-```
-
-</details>
 
 The architecture has three layers. At the top, both CLI and desktop converge on the same `goose-server` (an Axum-based HTTP/WebSocket server). The server manages sessions (SQLite persistence) and hands off messages to the `Agent`. The Agent is the orchestration hub — it owns the prompt manager, extension manager, tool inspection pipeline, and provider connection. Below it, extensions live as MCP clients: some run in-process ("platform extensions"), some spawn as child processes ("builtin" and "stdio"), and some connect over HTTP ("streamable_http").
 
@@ -168,48 +108,6 @@ Five inspectors, each implementing the `ToolInspector` trait, each producing `In
 
 ### The Agent Loop
 
-```mermaid
-sequenceDiagram
-    participant User
-    participant Agent
-    participant PromptMgr as Prompt Manager
-    participant Provider as LLM Provider
-    participant ExtMgr as Extension Manager
-    participant Inspectors as Tool Inspectors
-
-    User->>Agent: reply(message)
-    Agent->>Agent: check_if_compaction_needed()
-    alt Context exceeds threshold
-        Agent->>Provider: compact_messages() (summarize)
-        Agent-->>User: HistoryReplaced event
-    end
-
-    loop max_turns (default: 1000)
-        Agent->>PromptMgr: build system prompt
-        Agent->>Provider: stream_response(system, messages, tools)
-        Provider-->>Agent: streaming chunks
-
-        alt No tool calls in response
-            Agent-->>User: text response
-            Agent->>Agent: handle_retry_logic()
-            Note over Agent: break if no FinalOutputTool
-        else Tool calls present
-            Agent->>Agent: categorize_tools(frontend vs backend)
-            Agent->>Inspectors: inspect_tools(requests, history)
-            Inspectors-->>Agent: approved / needs_approval / denied
-
-            par Execute approved tools
-                Agent->>ExtMgr: dispatch_tool_call()
-                ExtMgr-->>Agent: ToolCallResult + notifications
-            and Handle approvals
-                Agent-->>User: ActionRequired event
-                User-->>Agent: PermissionConfirmation
-            end
-
-            Agent->>Agent: append results to conversation
-        end
-    end
-```
 
 The reply loop inside `reply_internal` is the heart of the system. It's a `loop` (not a `for`) with a configurable maximum turns counter (default 1000, which is generous). Each iteration: build the prompt, call the provider, parse the response, categorize tool calls into frontend/backend, run them through the inspection pipeline, execute approved ones in parallel, wait for user approval on flagged ones, collect results, append to conversation, and loop.
 
@@ -223,43 +121,6 @@ Three things stand out:
 
 ### The Extension Manager
 
-```mermaid
-graph LR
-    subgraph ExtensionManager
-        Registry["Extension Registry\n(HashMap‹String, Extension›)"]
-        ToolsCache["Tools Cache\n(Arc‹Vec‹Tool›› + atomic version)"]
-    end
-
-    subgraph ExtensionTypes["Extension Types"]
-        PlatformExt["Platform\ndeveloper, analyze, todo,\napps, summon, orchestrator,\nchatrecall, ext_manager, tom"]
-        BuiltinExt["Builtin MCP\nmemory, computercontroller,\nautovisualiser, tutorial"]
-        StdioExt["Stdio MCP\nAny MCP server via\nchild process"]
-        HttpExt["StreamableHTTP\nRemote MCP servers"]
-        InlinePy["InlinePython\nPython code via uvx"]
-    end
-
-    Registry --> PlatformExt
-    Registry --> BuiltinExt
-    Registry --> StdioExt
-    Registry --> HttpExt
-    Registry --> InlinePy
-
-    PlatformExt -.->|"implements McpClientTrait"| Registry
-    BuiltinExt -.->|"McpClient via DuplexStream"| Registry
-    StdioExt -.->|"McpClient via TokioChildProcess"| Registry
-    HttpExt -.->|"McpClient via StreamableHTTP"| Registry
-
-    classDef primary fill:#2563eb,stroke:#1e40af,color:#fff
-    classDef secondary fill:#7c3aed,stroke:#5b21b6,color:#fff
-    classDef accent fill:#059669,stroke:#047857,color:#fff
-    classDef warn fill:#d97706,stroke:#b45309,color:#fff
-    classDef neutral fill:#374151,stroke:#1f2937,color:#fff
-
-    class Registry primary
-    class ToolsCache accent
-    class PlatformExt secondary
-    class BuiltinExt secondary
-```
 
 The `ExtensionManager` maintains a `HashMap<String, Extension>` protected by a `tokio::sync::Mutex`. Each `Extension` wraps a `McpClientBox` (which is `Arc<dyn McpClientTrait>`) plus its config and server info. Tools are cached with an atomic counter for cache invalidation — `tools_cache_version` bumps every time an extension is added or removed, and the cached `Arc<Vec<Tool>>` is only rebuilt when stale.
 
