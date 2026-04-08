@@ -1,6 +1,6 @@
 > **Note:** This teardown analyzes code from a source map leak that became publicly available. All analysis is for educational and commentary purposes under fair use. No proprietary code is reproduced in sufficient quantity to substitute for the original work.
 
-# 🔬 Claude Code: 510K Lines, a 1729-Line God Object, and 18 Virtual Pet Species Hidden in a Coding Agent
+# Claude Code: 510K Lines, a 1729-Line God Object, and 18 Virtual Pet Species Hidden in a Coding Agent
 
 > **The most advanced AI coding agent in production, dissected.**
 > 510,000 lines of TypeScript. 1,903 files. The complete architecture of how Anthropic built an AI that codes autonomously - revealed through an accidental npm source map leak.
@@ -10,7 +10,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-> 📌 This analysis tracks Claude Code's evolution. **Star to get updates** as new versions are analyzed.
+> This analysis tracks Claude Code's evolution. **Star to get updates** as new versions are analyzed.
 
 ## At a Glance
 
@@ -97,13 +97,13 @@ The entire agent runs from one file: `src/query.ts`, 1,729 lines.
 
 ```
 while (true) {
-    ① Trim context (4-layer cascade)
-    ② Pre-fetch memory + skills
-    ③ Call Claude API (streaming)
-    ④ While receiving stream → detect tool_use blocks
-       → Start executing tools IMMEDIATELY (don't wait!)
-    ⑤ Tools called? → append results → continue loop
-    ⑥ No tools? → return response → exit
+ ① Trim context (4-layer cascade)
+ ② Pre-fetch memory + skills
+ ③ Call Claude API (streaming)
+ ④ While receiving stream → detect tool_use blocks
+ → Start executing tools IMMEDIATELY (don't wait!)
+ ⑤ Tools called? → append results → continue loop
+ ⑥ No tools? → return response → exit
 }
 ```
 
@@ -155,14 +155,14 @@ Every tool is a `buildTool()` factory function:
 
 ```typescript
 ToolDefinition = {
-    name           // "bash"
-    description    // For Claude to understand when to use it
-    inputSchema    // Zod v4 → auto-generates JSON Schema
-    call()         // AsyncGenerator (streaming results)
-    isReadOnly()   // Can it run in parallel?
-    getPermissions() // What does user need to approve?
-    renderToolUse()  // React component for terminal display
-    getToolUseSummary() // Compressed version for context mgmt
+ name // "bash"
+ description // For Claude to understand when to use it
+ inputSchema // Zod v4 → auto-generates JSON Schema
+ call() // AsyncGenerator (streaming results)
+ isReadOnly() // Can it run in parallel?
+ getPermissions() // What does user need to approve?
+ renderToolUse() // React component for terminal display
+ getToolUseSummary() // Compressed version for context mgmt
 }
 ```
 
@@ -189,8 +189,8 @@ Two layers, each with a specific purpose:
 import { feature } from 'bun:bundle'
 
 const voiceModule = feature('VOICE_MODE')
-    ? require('./voice/index.js')  // Exists in binary
-    : null                          // Physically gone
+ ? require('./voice/index.js') // Exists in binary
+ : null // Physically gone
 ```
 
 Not just disabled - **deleted from the binary**. Security researchers can't find what doesn't exist. This is why Bun was chosen over Node.
@@ -201,7 +201,7 @@ Not just disabled - **deleted from the binary**. Security researchers can't find
 // All gates prefixed "tengu_" - Japanese for heavenly dog
 // Internal codename for the Claude Code project
 const enabled = checkStatsigFeatureGate_CACHED_MAY_BE_STALE(
-    'tengu_streaming_tool_execution2'
+ 'tengu_streaming_tool_execution2'
 )
 ```
 
@@ -211,8 +211,8 @@ Reads from disk cache, accepts stale reads, never blocks startup.
 
 ```javascript
 if (feature('ABLATION_BASELINE')) {
-    // Disables: thinking, compaction, auto-memory, background tasks
-    // Measures: what does each feature ACTUALLY contribute?
+ // Disables: thinking, compaction, auto-memory, background tasks
+ // Measures: what does each feature ACTUALLY contribute?
 }
 ```
 
@@ -234,13 +234,13 @@ Workers cannot create sub-workers - prevents resource explosion. Three backends:
 
 ## Unreleased Features Found in the Code
 
-### 🎤 Voice Mode (codename: Amber Quartz)
+### Voice Mode (codename: Amber Quartz)
 Full `src/voice/` directory. Only works with Claude.ai OAuth. Has a kill switch: `tengu_amber_quartz_disabled`.
 
-### 🌉 Bridge Mode: Remote Desktop Control
+### Bridge Mode: Remote Desktop Control
 `claude remote-control` turns your local environment into a remote terminal for claude.ai. Up to 32 concurrent sessions. JWT auth + trusted device mechanism.
 
-### 🐣 Buddy: The Virtual Pet System
+### Buddy: The Virtual Pet System
 
 18 species. 5 rarity tiers (Common 60% → Legendary 1%). RPG stats: DEBUGGING, PATIENCE, CHAOS, WISDOM, SNARK. Hats (crown, top hat, propeller hat, halo, wizard hat). 1% shiny variants.
 
@@ -389,10 +389,10 @@ npm publish included `.map` files → `.map` referenced a source zip on Cloudfla
 
 **awesome-ai-anatomy** dissects the architecture of important AI projects - one project at a time.
 
-- 📐 Architecture diagrams (Mermaid + hand-drawn style)
-- 🔍 Design decision analysis (why, not just what)
-- ⚖️ Trade-off discussions
-- 🔬 Comparison with alternatives
+- Architecture diagrams (Mermaid + hand-drawn style)
+- Design decision analysis (why, not just what)
+- Trade-off discussions
+- Comparison with alternatives
 
 **Next up:** ByteDance DeerFlow, LangChain, Dify
 
