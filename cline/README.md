@@ -57,13 +57,10 @@ Cline is a VS Code extension that puts an AI coding agent in your sidebar. You d
 
 ## Architecture Overview
 
+
+![Architecture Overview](cline-1.png)
+
 ![Cline Architecture](architecture.png)
-
-<!-- Additional architecture diagrams -->
-
-![Diagram 1](cline-1.png)
-
-
 ![Diagram 2](cline-2.png)
 
 
@@ -106,6 +103,9 @@ For comparison: Claude Code's equivalent is `query.ts` at 1,729 lines. Goose's a
 
 ## The Agent Loop: How It Actually Works
 
+
+
+![The Agent Loop: How It Actually Works](cline-2.png)
 
 The core loop pattern:
 
