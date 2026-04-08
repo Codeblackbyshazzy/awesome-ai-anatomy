@@ -35,6 +35,17 @@ The pitch: 9x faster than Chrome, 16x less memory, instant startup. The reality:
 
 ![Architecture](architecture.png)
 
+<!-- Additional architecture diagrams -->
+
+![Diagram 1](lightpanda-browser-1.png)
+
+
+![Diagram 2](lightpanda-browser-2.png)
+
+
+![Diagram 3](lightpanda-browser-3.png)
+
+
 
 The architecture is a straightforward pipeline: network data comes in through libcurl, gets parsed by html5ever into a DOM tree managed entirely in Zig, V8 runs JavaScript against that DOM through a binding layer, and CDP exposes all of this to external tools like Playwright and Puppeteer.
 
