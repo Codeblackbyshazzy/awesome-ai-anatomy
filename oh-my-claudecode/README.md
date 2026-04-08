@@ -36,6 +36,17 @@ The weird part: it also spawns Codex and Gemini CLI workers alongside Claude. So
 
 ![Architecture](architecture.png)
 
+<!-- Additional architecture diagrams -->
+
+![Diagram 1](oh-my-claudecode-1.png)
+
+
+![Diagram 2](oh-my-claudecode-2.png)
+
+
+![Diagram 3](oh-my-claudecode-3.png)
+
+
 
 ## File-Based IPC: The Most Interesting Design Decision
 
