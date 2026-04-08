@@ -59,6 +59,14 @@ Cline is a VS Code extension that puts an AI coding agent in your sidebar. You d
 
 ![Cline Architecture](architecture.png)
 
+<!-- Additional architecture diagrams -->
+
+![Diagram 1](cline-1.png)
+
+
+![Diagram 2](cline-2.png)
+
+
 *Architecture diagram ([source .d2](architecture.d2)) — Red highlights the 3,756-line God Object at the center of the system. Dashed red line shows the polling-based approval flow between Task and the VS Code webview.*
 
 
