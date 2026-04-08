@@ -64,6 +64,20 @@
 
 ![Architecture](architecture.png)
 
+<!-- Additional architecture diagrams -->
+
+![Diagram 1](claude-code-1.png)
+
+
+![Diagram 2](claude-code-2.png)
+
+
+![Diagram 3](claude-code-3.png)
+
+
+![Diagram 4](claude-code-4.png)
+
+
 
 ---
 
