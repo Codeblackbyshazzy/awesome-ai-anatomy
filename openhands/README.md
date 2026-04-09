@@ -33,6 +33,15 @@ OpenHands is a web-based AI agent platform for software development. It runs cod
 
 ## Architecture
 
+![Architecture](architecture.png)
+
+![Condenser Pipeline](openhands-1.png)
+
+![Security Architecture](openhands-2.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 graph LR
     subgraph Entry["Entry Points"]
@@ -103,6 +112,8 @@ graph LR
     Runtime --> ActionExec
     ConvMgr --> Integrations
 ```
+
+</details>
 
 The architecture has five layers. At the top, three entry points (web UI, CLI, issue resolver) converge on the V1 App Server, which manages conversations and routes them to the V0 Legacy Core. The core is an event-driven system centered on the `AgentController` — a 1,391-line class that orchestrates the agent loop, stuck detection, delegation, and security checks. Agents (primarily CodeActAgent) produce actions that flow through the Memory system (with configurable condensation) and Security layer before reaching the Runtime, which executes commands inside Docker containers.
 

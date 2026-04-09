@@ -1,0 +1,65 @@
+direction: right
+
+title: "Security Analyzer Architecture" {
+  style.fill: "#fdf4ff"
+  style.stroke: "#a855f7"
+  style.font-size: 24
+}
+
+action: "Agent Action\n(e.g., CmdRunAction)" {
+  style.fill: "#374151"
+  style.font-color: "#fff"
+}
+
+base: "SecurityAnalyzer (base class)" {
+  style.fill: "#f5f3ff"
+  style.stroke: "#7c3aed"
+
+  method: "security_risk(action) → ActionSecurityRisk"
+  stream: "set_event_stream(events)"
+}
+
+grayswan: "GraySwan Analyzer (208 lines)" {
+  style.fill: "#a855f7"
+  style.font-color: "#fff"
+
+  api: "Cygnal API\n(external ML service)"
+  convert: "Convert events → OpenAI format"
+  threshold: "Risk thresholds:\nLOW < 0.3\nMEDIUM < 0.7\nHIGH < 1.0"
+  env: "Requires: GRAYSWAN_API_KEY"
+}
+
+invariant: "Invariant Analyzer (133 lines)" {
+  style.fill: "#6366f1"
+  style.font-color: "#fff"
+
+  client: "InvariantClient\n(policy engine)"
+  policy: "User-defined policies\n(what agent can/cannot do)"
+  trace: "Maintains event trace"
+  confirm: "Policy violation →\nask user for confirmation"
+}
+
+llm_risk: "LLM Risk Analyzer (48 lines)" {
+  style.fill: "#8b5cf6"
+  style.font-color: "#fff"
+
+  self_eval: "Same LLM evaluates\nits own action risk"
+  note: "Lightest approach\n(zero external deps)"
+}
+
+risk_levels: "ActionSecurityRisk" {
+  style.fill: "#fef2f2"
+  style.stroke: "#dc2626"
+
+  low: "LOW → proceed" {style.fill: "#bbf7d0"}
+  medium: "MEDIUM → log warning" {style.fill: "#fde68a"}
+  high: "HIGH → block or confirm" {style.fill: "#fca5a5"}
+}
+
+action -> base
+base -> grayswan: "Option 1: External ML"
+base -> invariant: "Option 2: Policy rules"
+base -> llm_risk: "Option 3: Self-eval"
+grayswan -> risk_levels
+invariant -> risk_levels
+llm_risk -> risk_levels

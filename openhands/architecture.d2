@@ -1,0 +1,149 @@
+direction: down
+
+entry: "Entry Points" {
+  style.fill: "#f0f4ff"
+  style.stroke: "#2563eb"
+
+  webui: "Web UI" {
+    style.fill: "#2563eb"
+    style.font-color: "#fff"
+    label: "Web UI\n(React + Vite)"
+  }
+  cli: "CLI" {
+    style.fill: "#3b82f6"
+    style.font-color: "#fff"
+    label: "CLI\n(headless mode)"
+  }
+  resolver: "Issue Resolver" {
+    style.fill: "#60a5fa"
+    style.font-color: "#fff"
+    label: "Issue Resolver\n(7,039 lines)"
+  }
+}
+
+app_server: "V1 App Server (FastAPI)" {
+  style.fill: "#faf5ff"
+  style.stroke: "#7c3aed"
+
+  conv_mgr: "Conversation Manager" {
+    style.fill: "#7c3aed"
+    style.font-color: "#fff"
+    label: "Conversation Manager\n(886 lines)"
+  }
+  routes: "Routes\n(82 clusters)"
+  auth: "Auth Layer"
+}
+
+v0_core: "V0 Legacy Core ⚠️ DEPRECATED" {
+  style.fill: "#fef2f2"
+  style.stroke: "#dc2626"
+
+  agent_ctrl: "AgentController" {
+    style.fill: "#dc2626"
+    style.font-color: "#fff"
+    label: "AgentController\n(1,391 lines — God Object)"
+  }
+  stuck: "StuckDetector" {
+    style.fill: "#ef4444"
+    style.font-color: "#fff"
+    label: "StuckDetector\n(487 lines)"
+  }
+  event_stream: "EventStream\n(pub/sub bus)"
+  state: "State Tracker"
+  replay: "Replay Manager"
+
+  agent_ctrl -> stuck
+  agent_ctrl -> event_stream
+  agent_ctrl -> state
+  agent_ctrl -> replay
+}
+
+agents: "Agent Hub (6 agents)" {
+  style.fill: "#fffbeb"
+  style.stroke: "#d97706"
+
+  codeact: "CodeActAgent" {
+    style.fill: "#d97706"
+    style.font-color: "#fff"
+    label: "CodeActAgent ★\n(primary, 316 lines)"
+  }
+  browsing: "BrowsingAgent"
+  visual: "VisualBrowsingAgent"
+  loc: "LOCAgent"
+  readonly: "ReadOnlyAgent"
+  dummy: "DummyAgent\n(testing)"
+}
+
+memory: "Memory System" {
+  style.fill: "#f0fdf4"
+  style.stroke: "#16a34a"
+
+  conv_memory: "ConversationMemory"
+  condenser: "Condenser Pipeline" {
+    style.fill: "#16a34a"
+    style.font-color: "#fff"
+    label: "Condenser Pipeline\n(10 strategies)"
+  }
+}
+
+security: "Security Layer (3 analyzers)" {
+  style.fill: "#fdf4ff"
+  style.stroke: "#a855f7"
+
+  grayswan: "GraySwan" {
+    style.fill: "#a855f7"
+    style.font-color: "#fff"
+    label: "GraySwan Analyzer\n(external ML API)"
+  }
+  invariant: "Invariant" {
+    label: "Invariant Analyzer\n(policy engine)"
+  }
+  llm_risk: "LLM Risk" {
+    label: "LLM Risk Analyzer\n(self-evaluation)"
+  }
+}
+
+runtime: "Runtime Layer" {
+  style.fill: "#ecfeff"
+  style.stroke: "#0891b2"
+
+  docker: "Docker" {
+    style.fill: "#0891b2"
+    style.font-color: "#fff"
+    label: "Docker Runtime ★"
+  }
+  k8s: "Kubernetes"
+  local: "Local"
+  remote: "Remote"
+  action_exec: "Action Execution Server\n(in-sandbox)"
+
+  docker -> action_exec
+  k8s -> action_exec
+  local -> action_exec
+  remote -> action_exec
+}
+
+integrations: "Git Integrations" {
+  style.fill: "#f0f9ff"
+  style.stroke: "#0369a1"
+
+  github: "GitHub"
+  gitlab: "GitLab"
+  bitbucket: "Bitbucket"
+  azure: "Azure DevOps"
+  forgejo: "Forgejo"
+}
+
+entry.webui -> app_server.routes
+entry.cli -> v0_core.agent_ctrl
+entry.resolver -> v0_core.agent_ctrl
+app_server.routes -> app_server.conv_mgr
+app_server.conv_mgr -> v0_core.agent_ctrl
+v0_core.agent_ctrl -> agents.codeact
+agents.codeact -> memory.conv_memory
+memory.conv_memory -> memory.condenser
+v0_core.agent_ctrl -> security.grayswan
+v0_core.agent_ctrl -> security.invariant
+v0_core.agent_ctrl -> security.llm_risk
+v0_core.agent_ctrl -> runtime.docker
+app_server.conv_mgr -> integrations.github

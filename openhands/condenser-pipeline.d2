@@ -1,0 +1,80 @@
+direction: down
+
+title: "Memory Condenser Pipeline" {
+  style.fill: "#f0fdf4"
+  style.stroke: "#16a34a"
+  style.font-size: 24
+}
+
+input: "Event History\n(Actions + Observations)" {
+  style.fill: "#374151"
+  style.font-color: "#fff"
+}
+
+pipeline: "Condenser Pipeline (composable)" {
+  style.fill: "#f0fdf4"
+  style.stroke: "#16a34a"
+
+  noop: "NoOpCondenser\n(pass-through)" {
+    style.fill: "#e5e7eb"
+  }
+  recent: "RecentEventsCondenser\n(keep last N)" {
+    style.fill: "#dbeafe"
+  }
+  obs_mask: "ObservationMaskingCondenser\n(replace content with placeholders)" {
+    style.fill: "#dbeafe"
+  }
+  browser: "BrowserOutputCondenser\n(clean verbose browser output)" {
+    style.fill: "#dbeafe"
+  }
+  amortized: "AmortizedForgettingCondenser" {
+    style.fill: "#fde68a"
+    label: "AmortizedForgettingCondenser\n(probabilistic decay — older = more likely to drop)"
+  }
+  conv_window: "ConversationWindowCondenser" {
+    style.fill: "#fde68a"
+    label: "ConversationWindowCondenser\n(sliding window, keep-first/keep-last)"
+  }
+  llm_attention: "LLMAttentionCondenser" {
+    style.fill: "#fca5a5"
+    label: "LLMAttentionCondenser\n(LLM scores importance, keeps high-scoring)"
+  }
+  llm_summarize: "LLMSummarizingCondenser" {
+    style.fill: "#fca5a5"
+    label: "LLMSummarizingCondenser\n(LLM generates summary replacement)"
+  }
+  structured: "StructuredSummaryCondenser" {
+    style.fill: "#c084fc"
+    style.font-color: "#fff"
+    label: "StructuredSummaryCondenser ★\n(329 lines — task progress tracking)"
+  }
+  chain: "Pipeline Combinator" {
+    style.fill: "#16a34a"
+    style.font-color: "#fff"
+    label: "Pipeline Combinator\n(chain any N condensers)"
+  }
+}
+
+output_view: "View\n(condensed events → LLM)" {
+  style.fill: "#059669"
+  style.font-color: "#fff"
+}
+
+output_action: "Condensation\n(event in history — auditable)" {
+  style.fill: "#d97706"
+  style.font-color: "#fff"
+}
+
+input -> pipeline.chain
+pipeline.chain -> output_view: "within budget"
+pipeline.chain -> output_action: "needs condensation"
+output_action -> input: "next step re-processes"
+
+pipeline.noop -> pipeline.recent: "Rule-based\n(fast, no LLM cost)" {style.stroke-dash: 3}
+pipeline.recent -> pipeline.obs_mask {style.stroke-dash: 3}
+pipeline.obs_mask -> pipeline.browser {style.stroke-dash: 3}
+pipeline.browser -> pipeline.amortized: "Statistical\n(probabilistic)" {style.stroke-dash: 3}
+pipeline.amortized -> pipeline.conv_window {style.stroke-dash: 3}
+pipeline.conv_window -> pipeline.llm_attention: "LLM-powered\n(expensive, smart)" {style.stroke-dash: 3}
+pipeline.llm_attention -> pipeline.llm_summarize {style.stroke-dash: 3}
+pipeline.llm_summarize -> pipeline.structured {style.stroke-dash: 3}
