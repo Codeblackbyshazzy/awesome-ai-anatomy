@@ -28,7 +28,7 @@ Goose is an on-machine AI agent that runs shell commands, edits files, manages e
 | Code Quality | A | 124K Rust LOC with Tokio async, clean crate boundaries, Axum HTTP layer |
 | Security | B+ | Extension sandboxing via MCP process isolation; no per-tool permission model like Codex |
 | Documentation | B+ | README and extension API docs cover the surface; internal architecture requires code reading |
-| **Overall** | **A-** | **MCP-first design is forward-looking; 30+ provider support via registry pattern is well-executed** |
+| **Overall** | **A-** | **MCP-first design ages better than tool-specific integrations; 30+ provider support via registry pattern is well-executed** |
 
 ## Architecture
 
@@ -43,9 +43,9 @@ Goose is an on-machine AI agent that runs shell commands, edits files, manages e
 
 The architecture has three layers. At the top, both CLI and desktop converge on the same `goose-server` (an Axum-based HTTP/WebSocket server). The server manages sessions (SQLite persistence) and hands off messages to the `Agent`. The Agent is the orchestration hub — it owns the prompt manager, extension manager, tool inspection pipeline, and provider connection. Below it, extensions live as MCP clients: some run in-process ("platform extensions"), some spawn as child processes ("builtin" and "stdio"), and some connect over HTTP ("streamable_http").
 
-What surprised me: the Agent doesn't contain any tool execution logic itself. It's purely a dispatcher. Every capability — file editing, shell execution, code analysis, even the todo list — lives in an extension. The `developer` extension (which provides `shell`, `edit`, `write`, `tree` tools) is technically just another MCP client that happens to run in-process. You could rip it out and replace it with an external process and the agent loop wouldn't notice.
+The Agent doesn't contain any tool execution logic itself. It's purely a dispatcher. Every capability — file editing, shell execution, code analysis, even the todo list — lives in an extension. The `developer` extension (which provides `shell`, `edit`, `write`, `tree` tools) is technically just another MCP client that happens to run in-process. You could rip it out and replace it with an external process and the agent loop wouldn't notice.
 
-The second surprise is how seriously they take the tool inspection pipeline. Before any tool call executes, it passes through five inspectors in priority order: SecurityInspector (prompt injection scanning), EgressInspector, AdversaryInspector (LLM-based review), PermissionInspector, and RepetitionInspector. This is a proper chain-of-responsibility pattern, not an afterthought.
+The tool inspection pipeline shows how seriously they take the tool inspection pipeline. Before any tool call executes, it passes through five inspectors in priority order: SecurityInspector (prompt injection scanning), EgressInspector, AdversaryInspector (LLM-based review), PermissionInspector, and RepetitionInspector. This is a proper chain-of-responsibility pattern, not an afterthought.
 
 **Files to reference:**
 - `crates/goose/src/agents/agent.rs` — The 900-line Agent struct and reply loop
@@ -107,7 +107,7 @@ fn create_tool_inspection_manager(
 }
 ```
 
-Five inspectors, each implementing the `ToolInspector` trait, each producing `InspectionResult` values with `Allow`, `RequireApproval`, or `Deny` actions. The SecurityInspector uses pattern matching and optional ML classification to detect prompt injection. The AdversaryInspector can call the LLM itself to review suspicious tool calls. The RepetitionInspector catches infinite loops. This is not something I've seen in Claude Code or OpenClaw — they handle permissions, yes, but not a configurable inspection pipeline.
+Five inspectors, each implementing the `ToolInspector` trait, each producing `InspectionResult` values with `Allow`, `RequireApproval`, or `Deny` actions. The SecurityInspector uses pattern matching and optional ML classification to detect prompt injection. The AdversaryInspector can call the LLM itself to review suspicious tool calls. The RepetitionInspector catches infinite loops. Claude Code and OpenClaw handle permissions, but neither has a pluggable inspection chain — they handle permissions, yes, but not a configurable inspection pipeline.
 
 ---
 
