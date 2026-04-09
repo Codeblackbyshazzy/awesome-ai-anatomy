@@ -232,6 +232,8 @@ Workers cannot create sub-workers - prevents resource explosion. Three backends:
 
 ## Unreleased Features Found in the Code
 
+*(These features were identified in publicly available npm source maps. Their presence does not confirm future product plans.)*
+
 ### Voice Mode (codename: Amber Quartz)
 Full `src/voice/` directory. Only works with Claude.ai OAuth. Has a kill switch: `tengu_amber_quartz_disabled`.
 
@@ -244,11 +246,10 @@ Full `src/voice/` directory. Only works with Claude.ai OAuth. Has a kill switch:
 
 All species names are hex-encoded:
 ```javascript
-// "One species name collides with a model-codename canary"
 const duck = String.fromCharCode(0x64,0x75,0x63,0x6b)
 ```
 
-One of these 18 names is the codename for Anthropic's next model: duck, goose, blob, cat, dragon, octopus, owl, penguin, turtle, snail, ghost, axolotl, capybara, cactus, robot, rabbit, mushroom, chonk.
+The 18 species are: duck, goose, blob, cat, dragon, octopus, owl, penguin, turtle, snail, ghost, axolotl, capybara, cactus, robot, rabbit, mushroom, chonk.
 
 ---
 
@@ -359,7 +360,7 @@ Each tool is a plain object with schema, permissions, execution, UI rendering, a
 
 ## Hooks & Easter Eggs
 
-**18 virtual pet species with hex-encoded names.** The `Buddy` system hides species names behind `String.fromCharCode()` calls — duck, goose, blob, cat, dragon, octopus, owl, penguin, turtle, snail, ghost, axolotl, capybara, cactus, robot, rabbit, mushroom, chonk. One collides with an internal model codename canary. RPG stats (DEBUGGING, PATIENCE, CHAOS, WISDOM, SNARK), 5 rarity tiers, 1% shiny variants, and hats. All this in a coding agent.
+**18 virtual pet species with hex-encoded names.** The `Buddy` system hides species names behind `String.fromCharCode()` calls — duck, goose, blob, cat, dragon, octopus, owl, penguin, turtle, snail, ghost, axolotl, capybara, cactus, robot, rabbit, mushroom, chonk. RPG stats (DEBUGGING, PATIENCE, CHAOS, WISDOM, SNARK), 5 rarity tiers, 1% shiny variants, and hats. All this in a coding agent.
 
 **KAIROS autonomous mode.** Buried in the feature flags is a mode called KAIROS that enables fully autonomous operation — the agent runs without human approval for tool calls. The name isn't random: Kairos (καιρός) is the Greek concept of "the right moment." Someone on the team has a classics background.
 

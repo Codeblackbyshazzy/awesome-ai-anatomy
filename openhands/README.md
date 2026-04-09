@@ -272,9 +272,9 @@ This creates a real dilemma for contributors: do you fix bugs in V0 code that's 
 
 ## The Verdict
 
-OpenHands has the most sophisticated memory management system of any open-source agent. The 10-condenser pipeline with composable strategies, voluntary condensation requests, and auditable condensation events is genuinely novel. If you're building an agent and need inspiration for context management, start here.
+OpenHands has the most sophisticated memory management system of any open-source agent. The 10-condenser pipeline with composable strategies, voluntary condensation requests, and auditable condensation events is the most interesting context management design I've found in any open-source agent. If you're building an agent and need inspiration for context management, start here.
 
-The security architecture is also best-in-class: three complementary approaches (external ML, policy engine, self-evaluation) that can be used individually or together. Compare this to Claude Code's static allowlist or Cline's "do nothing and hope for the best."
+The security architecture is the most structured I've seen in any open-source agent: three complementary approaches (external ML, policy engine, self-evaluation) that can be used individually or together. Compare this to Claude Code's static allowlist or Cline's "do nothing and hope for the best."
 
 The stuck detector is a standout feature that other projects should steal. A 487-line class dedicated to detecting and recovering from agent loops, with pattern analysis, configurable thresholds, and a separate test suite — this treats stuck detection as the engineering problem it actually is.
 

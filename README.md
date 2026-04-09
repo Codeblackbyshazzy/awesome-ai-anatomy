@@ -173,14 +173,13 @@ New teardown every week. Cursor, Windsurf, and others are on the list.
 
 ---
 
-<details>
-<summary>Disclaimer</summary>
+## Legal Notice
 
-These teardowns are independent technical commentary for educational purposes. All code snippets are cited under fair use for criticism, commentary, and education. Project names and trademarks belong to their respective owners. Star counts and LOC figures are snapshots at time of writing and may have changed.
+These teardowns are independent technical commentary for educational purposes under fair use (criticism, commentary, and education). Analysis of proprietary products is based on publicly available information including published npm packages, source maps, and documentation. No source code from analyzed projects is hosted in this repository — only short citations for commentary.
 
-If you're a project maintainer and have concerns about any content, please [open an issue](https://github.com/NeuZhou/awesome-ai-anatomy/issues/new).
+Project names and trademarks belong to their respective owners. Star counts and metrics are snapshots at time of writing. Analysis may contain errors — please verify claims against current source code.
 
-</details>
+For takedown requests, please [open an issue](https://github.com/NeuZhou/awesome-ai-anatomy/issues/new) with specific concerns.
 
 ---
 
